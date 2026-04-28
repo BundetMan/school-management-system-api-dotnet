@@ -5,13 +5,12 @@ namespace SchoolAPI.Models.Curriculum_Bridges
 {
     public class Subject
     {
-        [Key]
-        public string SubjectId { get; set; } = default!;
+        public string Id { get; set; } = default!;
 
-        [Required, MaxLength(50)]
+        [Required, MaxLength(100)]
         public string Name { get; set; } = default!;
 
-        [Required, MaxLength(20)]
+        [Required, MaxLength(50)]
         public string Code { get; set; } = default!;
 
         public ICollection<ClassSubject> ClassSubjects { get; set; } = default!;

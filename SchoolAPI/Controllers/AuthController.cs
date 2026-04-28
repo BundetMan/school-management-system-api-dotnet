@@ -5,8 +5,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        
     }
 }

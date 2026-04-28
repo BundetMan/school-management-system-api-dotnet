@@ -1,29 +1,19 @@
 ﻿using SchoolAPI.Models.Registrations;
 using SchoolAPI.Models.PaymentsWaitlists;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace SchoolAPI.Models.People
 {
-    public class User
+    public class User : IdentityUser<string>
     {
-        [Key]
-        public string UserId { get; set; } = default!;
-
-        [Required, MaxLength(50)]
-        public string Username { get; set; } = default!;
-
-        [Required, MaxLength(50)]
-        public string Email { get; set; } = default!;
-
-        [Required, MaxLength(20)]
-        public string Role { get; set; } = default!;
-
-        [MaxLength(20)]
         public string Status { get; set; } = default!;
 
         public ICollection<Registration> ApprovedRegistrations { get; set; } = default!;
+        public ICollection<Registration> RejectedRegistrations { get; set; } = default!;
         public ICollection<Payment> ReceivedPayments { get; set; } = default!;
         public ICollection<Payment> VerifiedPayments { get; set; } = default!;
+        public Teacher? Teacher { get; set; }
+        public Student? Student { get; set; }
     }
-
 }

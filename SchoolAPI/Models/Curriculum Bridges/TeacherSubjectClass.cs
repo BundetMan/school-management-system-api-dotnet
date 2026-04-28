@@ -7,7 +7,6 @@ namespace SchoolAPI.Models.Curriculum_Bridges
 {
     public class TeacherSubjectClass
     {
-        [Key]
         public string Id { get; set; } = default!;
 
         [Required]

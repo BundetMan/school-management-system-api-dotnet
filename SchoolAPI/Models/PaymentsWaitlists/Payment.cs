@@ -6,23 +6,24 @@ namespace SchoolAPI.Models.PaymentsWaitlists
 {
     public class Payment
     {
-        [Key]
-        public string PaymentId { get; set; } = default!;
+        public string Id { get; set; } = default!;
 
         [Required, MaxLength(20)]
         public string Type { get; set; } = default!;
 
         [Range(0, double.MaxValue)]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         [Required, MaxLength(20)]
         public string Method { get; set; } = default!;
 
+        public string? ReferenceNumber { get; set; }
+        public string? SlipURL { get; set; }
+
         [MaxLength(20)]
         public string Status { get; set; } = "Pending";
 
-        public DateTime PaidAt { get; set; } = DateTime.UtcNow;
+        public DateTime? PaidAt { get; set; } = DateTime.UtcNow;
 
         [Required]
         public string StudentId { get; set; } = default!;

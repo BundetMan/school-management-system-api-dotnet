@@ -7,10 +7,7 @@ namespace SchoolAPI.Models.PaymentsWaitlists
 {
     public class Waitlist
     {
-        [Key]
-        public string WaitlistId { get; set; } = default!;
-
-        public DateTime QueuedAt { get; set; } = DateTime.UtcNow;
+        public string Id { get; set; } = default!;
 
         [Required]
         public string StudentId { get; set; } = default!;
@@ -19,5 +16,8 @@ namespace SchoolAPI.Models.PaymentsWaitlists
         [Required]
         public string ClassId { get; set; } = default!;
         public Class Class { get; set; } = default!;
+
+        public string? Notes { get; set; }
+        public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
     }
 }

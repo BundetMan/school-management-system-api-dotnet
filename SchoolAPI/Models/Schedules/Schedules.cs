@@ -8,8 +8,7 @@ namespace SchoolAPI.Models.Schedules
 {
     public class Schedule
     {
-        [Key]
-        public string ScheduleId { get; set; } = default!;
+        public string Id { get; set; } = default!;
 
         [Required, MaxLength(10)]
         public string Day { get; set; } = default!;

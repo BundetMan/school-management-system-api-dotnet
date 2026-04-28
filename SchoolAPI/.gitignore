@@ -1,12 +1,28 @@
-﻿# Visual Studio temporary files, build results, etc
-.vs/
+﻿# Build results
 bin/
 obj/
+
+# Visual Studio
+.vs/
 *.user
 *.suo
-*.db
-*.log
 
-# Rider/VSCode
+# Rider / VSCode
 .idea/
 .vscode/
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.mdf
+*.ldf
+*.sqlite
+
+# ASP.NET Core config secrets
+appsettings.Development.json
+secrets.json
+
+# Publish
+PublishOutput/

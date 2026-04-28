@@ -6,14 +6,14 @@ namespace SchoolAPI.Models.People
 {
     public class Teacher
     {
-        [Key]
-        public string TeacherId { get; set; } = default!;
+        public string Id { get; set; } = default!;
 
-        [Required, MaxLength(100)]
         public string Name { get; set; } = default!;
 
-        [MaxLength(100)]
         public string Specialization { get; set; } = default!;
+
+        public string UserId { get; set; } = default!;
+        public User User { get; set; } = default!;
 
         public ICollection<TeacherSubjectClass> TeacherSubjectClasses { get; set; } = default!;
         public ICollection<Schedule> Schedules { get; set; } = default!;
