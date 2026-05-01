@@ -1,61 +1,64 @@
-﻿using AutoMapper;
+﻿
+using Mapster;
 using SchoolAPI.DTOs.People;
 using SchoolAPI.Models;
 using SchoolAPI.Models.PaymentsWaitlists;
 using SchoolAPI.Models.People;
 using SchoolAPI.Models.Registrations;
 namespace SchoolAPI.Mappings;
-public class StudentProfile : Profile
+public class StudentProfile : IRegister
 {
-    public StudentProfile()
+    public void Register(TypeAdapterConfig config)
     {
-        CreateMap<Student, StudentDto>()
-            .ForMember(dest => dest.LevelName, opt => opt.MapFrom(src => src.Level != null ? src.Level.Name : string.Empty))
-            .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class != null ? src.Class.Name : string.Empty))
-            .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+        config.NewConfig<Student, StudentDto>()
+            .Map(dest => dest.LevelName, src => src.Level != null ? src.Level.Name : string.Empty)
+            .Map(dest => dest.ClassName, src => src.Class != null ? src.Class.Name : string.Empty)
+            .Map(dest => dest.Gender, src => src.Gender)
+            .Map(dest => dest.Status, src => src.Status);
 
-        CreateMap<Student, StudentDetailDto>()
-            .ForMember(dest => dest.LevelName, opt => opt.MapFrom(src => src.Level != null ? src.Level.Name : string.Empty))
-            .ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class != null ? src.Class.Name : string.Empty))
-            .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender.ToString()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+        config.NewConfig<Student, StudentDetailDto>()
+            .Map(dest => dest.LevelName, src => src.Level != null ? src.Level.Name : string.Empty)
+            .Map(dest => dest.ClassName, src => src.Class != null ? src.Class.Name : string.Empty)
+            .Map(dest => dest.Gender, src => src.Gender.ToString())
+            .Map(dest => dest.Status, src => src.Status.ToString());
 
+        config.NewConfig<StudentCreateDto, Student>()
+            .Map(dest => dest.Id, src => Guid.NewGuid().ToString())
+            .Map(dest => dest.Code, src => $"ST-{Guid.NewGuid().ToString().Substring(0, 8)}")
+            .Ignore(dest => dest.Level)
+            .Ignore(dest => dest.Class)
+            .Ignore(dest => dest.User)
+            .Ignore(dest => dest.Registrations)
+            .Ignore(dest => dest.Payments)
+            .Ignore(dest => dest.Waitlists);
 
-        CreateMap<StudentCreateDto, Student>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid().ToString()))
-            .ForMember(dest => dest.Code, opt => opt.MapFrom(src => $"ST-{Guid.NewGuid().ToString().Substring(0, 8)}"))
-            .ForMember(dest => dest.Level, opt => opt.Ignore())
-            .ForMember(dest => dest.Class, opt => opt.Ignore())
-            .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.Registrations, opt => opt.Ignore())
-            .ForMember(dest => dest.Payments, opt => opt.Ignore())
-            .ForMember(dest => dest.Waitlists, opt => opt.Ignore());
+        config.NewConfig<StudentUpdateDetailDto, Student>()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.Code)
+            .Ignore(dest => dest.Level)
+            .Ignore(dest => dest.Class)
+            .Ignore(dest => dest.User)
+            .Ignore(dest => dest.Registrations)
+            .Ignore(dest => dest.Payments)
+            .Ignore(dest => dest.Waitlists);
 
-        CreateMap<StudentUpdateDetailDto, Student>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.Code, opt => opt.Ignore())
-            .ForMember(dest => dest.Level, opt => opt.Ignore())
-            .ForMember(dest => dest.Class, opt => opt.Ignore())
-            .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.Registrations, opt => opt.Ignore())
-            .ForMember(dest => dest.Payments, opt => opt.Ignore())
-            .ForMember(dest => dest.Waitlists, opt => opt.Ignore());
+        config.NewConfig<StudentUpdateDto, Student>()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.Code)
+            .Ignore(dest => dest.Level)
+            .Ignore(dest => dest.Class)
+            .Ignore(dest => dest.User)
+            .Ignore(dest => dest.Registrations)
+            .Ignore(dest => dest.Payments)
+            .Ignore(dest => dest.Waitlists)
+            .IgnoreNullValues(true);
 
-        CreateMap<StudentUpdateDto, Student>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.Code, opt => opt.Ignore())
-            .ForMember(dest => dest.Level, opt => opt.Ignore())
-            .ForMember(dest => dest.Class, opt => opt.Ignore())
-            .ForMember(dest => dest.User, opt => opt.Ignore())
-            .ForMember(dest => dest.Registrations, opt => opt.Ignore())
-            .ForMember(dest => dest.Payments, opt => opt.Ignore())
-            .ForMember(dest => dest.Waitlists, opt => opt.Ignore())
-            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        config.NewConfig<Payment, PaymentSummaryDto>();
 
+        config.NewConfig<Registration, RegistrationSummaryDto>()
+            .Map(dest => dest.ClassName, src => src.Class.Name);
 
-        CreateMap<Payment, PaymentSummaryDto>(); 
-        CreateMap<Registration, RegistrationSummaryDto>().ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name)); 
-        CreateMap<Waitlist, WaitlistSummaryDto>().ForMember(dest => dest.ClassName, opt => opt.MapFrom(src => src.Class.Name));
+        config.NewConfig<Waitlist, WaitlistSummaryDto>()
+            .Map(dest => dest.ClassName, src => src.Class.Name);
     }
 }

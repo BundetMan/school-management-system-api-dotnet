@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.School_Structures;
 using SchoolAPI.Models.School_Structure;
@@ -8,31 +9,30 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LevelsController(ILevelService service, IMapper mapper) : ControllerBase
+    public class LevelsController(ILevelService service) : ControllerBase
     {
         private readonly ILevelService _service = service;
-        private readonly IMapper _mapper = mapper;
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LevelDto>>> GetLevels()
         {
             var levels = await _service.GetLevelsAsync();
-            return Ok(_mapper.Map<IEnumerable<LevelDto>>(levels));
+            return Ok(levels.Adapt<IEnumerable<LevelDto>>());
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<LevelDto>> GetLevel(string id)
         {
             var level = await _service.GetLevelByIdAsync(id);
             if (level == null) return NotFound();
-            return Ok(_mapper.Map<LevelDto>(level));
+            return Ok(level.Adapt<LevelDto>());
         }
         [HttpPost]
         public async Task<ActionResult<LevelDto>> CreateLevel(LevelCreateDto dto)
         {
-            var level = _mapper.Map<Level>(dto);
+            var level = dto.Adapt<Level>();
             var created = await _service.CreateLevelAsync(level);
             if (created == null) return BadRequest("Invalid SchoolLevelId");
 
-            var result = _mapper.Map<LevelDto>(created);
+            var result = created.Adapt<LevelDto>();
             return CreatedAtAction(nameof(GetLevel), new { id = created.Id }, result);
         }
         [HttpPut("{id}")]
@@ -41,9 +41,9 @@ namespace SchoolAPI.Controllers
             var existing = await _service.GetLevelByIdAsync(id);
             if (existing == null) return NotFound();
 
-            _mapper.Map(dto, existing);
+            dto.Adapt(existing);
             var updated = await _service.UpdateLevelAsync(existing);
-            return Ok(_mapper.Map<LevelDto>(updated));
+            return Ok(updated.Adapt<LevelDto>());
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLevel(string id)

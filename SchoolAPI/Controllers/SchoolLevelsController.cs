@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Models.School_Structure;
@@ -12,12 +12,10 @@ namespace SchoolAPI.Controllers
     public class SchoolLevelsController : ControllerBase
     {
         private readonly ISchoolLevelService _service;
-        private readonly IMapper _mapper;
 
-        public SchoolLevelsController(ISchoolLevelService service, IMapper mapper)
+        public SchoolLevelsController(ISchoolLevelService service)
         {
             _service = service;
-            _mapper = mapper;
         }
 
         // GET: api/SchoolLevels
@@ -25,7 +23,7 @@ namespace SchoolAPI.Controllers
         public async Task<ActionResult<IEnumerable<SchoolLevelDto>>> GetLevels()
         {
             var levels = await _service.GetLevelsAsync();
-            var result = _mapper.Map<IEnumerable<SchoolLevelDto>>(levels);
+            var result = levels.Adapt<IEnumerable<SchoolLevelDto>>();
             return Ok(result);
         }
 
@@ -36,7 +34,7 @@ namespace SchoolAPI.Controllers
             var level = await _service.GetLevelByIdAsync(id);
             if (level == null) return NotFound();
 
-            var result = _mapper.Map<SchoolLevelDto>(level);
+            var result = level.Adapt<SchoolLevelDto>();
             return Ok(result);
         }
 
@@ -44,10 +42,10 @@ namespace SchoolAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<SchoolLevelDto>> CreateLevel(SchoolLevelCreateDto dto)
         {
-            var level = _mapper.Map<SchoolLevel>(dto);
+            var level = dto.Adapt<SchoolLevel>();
             var created = await _service.CreateLevelAsync(level);
 
-            var result = _mapper.Map<SchoolLevelDto>(created);
+            var result = created.Adapt<SchoolLevelDto>();
             return CreatedAtAction(nameof(GetLevel), new { id = created?.Id }, result);
         }
 
@@ -58,10 +56,10 @@ namespace SchoolAPI.Controllers
             var existing = await _service.GetLevelByIdAsync(id);
             if (existing == null) return NotFound();
 
-            _mapper.Map(dto, existing);
+            dto.Adapt(existing);
             var updated = await _service.UpdateLevelAsync(existing);
 
-            var result = _mapper.Map<SchoolLevelDto>(updated);
+            var result = updated.Adapt<SchoolLevelDto>();
             return Ok(result);
         }
 

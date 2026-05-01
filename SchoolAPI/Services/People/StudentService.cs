@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
@@ -13,18 +13,15 @@ namespace SchoolAPI.Services.People
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository _studentRepo;
-        private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly SchoolDbContext _dbContext;
 
         public StudentService(
             IStudentRepository studentRepo,
-            IMapper mapper,
             UserManager<User> userManager,
             SchoolDbContext dbContext)
         {
             _studentRepo = studentRepo;
-            _mapper = mapper;
             _userManager = userManager;
             _dbContext = dbContext;
         }
@@ -32,20 +29,20 @@ namespace SchoolAPI.Services.People
         public async Task<StudentDto?> GetCodeAsync(string id)
         {
             var student = await _studentRepo.GetByCodeAsync(id);
-            return student == null ? null : _mapper.Map<StudentDto>(student);
+            return student?.Adapt<StudentDto>();
         }
 
         public async Task<StudentDetailDto?> GetByCodeWithDetailsAsync(string id)
         {
             var student = await _studentRepo.GetByCodeWithDetailsAsync(id);
-            return student == null ? null : _mapper.Map<StudentDetailDto>(student);
+            return student?.Adapt<StudentDetailDto>();
         }
 
         public async Task<PagedResult<StudentDto>> GetAllAsync(int page = 1, int pageSize = 30)
         {
             var (students, totalCount) = await _studentRepo.GetPageAsync(page, pageSize);
             return new PagedResult<StudentDto>(
-                _mapper.Map<IReadOnlyList<StudentDto>>(students),
+                students.Adapt<IReadOnlyList<StudentDto>>(),
                 totalCount,
                 page,
                 pageSize
@@ -55,7 +52,7 @@ namespace SchoolAPI.Services.People
         {
             var (students, totalCount) = await _studentRepo.GetPageWithDetailsAsync(page, pageSize);
             return new PagedResult<StudentDetailDto>(
-                _mapper.Map<IReadOnlyList<StudentDetailDto>>(students),
+                students.Adapt<IReadOnlyList<StudentDetailDto>>(),
                 totalCount,
                 page,
                 pageSize
@@ -87,7 +84,7 @@ namespace SchoolAPI.Services.People
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            var dtoList = _mapper.Map<IReadOnlyList<StudentDto>>(students);
+            var dtoList = students.Adapt<IReadOnlyList<StudentDto>>();
 
             return new PagedResult<StudentDto>(dtoList, totalCount, page, pageSize);
         }
@@ -114,7 +111,7 @@ namespace SchoolAPI.Services.People
                 .Take(pageSize)
                 .ToListAsync();
 
-            var dtoList = _mapper.Map<IReadOnlyList<StudentDetailDto>>(students);
+            var dtoList = students.Adapt<IReadOnlyList<StudentDetailDto>>();
             return new PagedResult<StudentDetailDto>(dtoList, totalCount, page, pageSize);
         }
 
@@ -122,7 +119,7 @@ namespace SchoolAPI.Services.People
         {
             var (queryable, count) = await _studentRepo.GetPageAsync(page, pageSize);
 
-            var dtoItems = _mapper.Map<IReadOnlyList<StudentDto>>(queryable);
+            var dtoItems = queryable.Adapt<IReadOnlyList<StudentDto>>();
 
             return new PagedResult<StudentDto>(
                 Items: dtoItems,
@@ -161,13 +158,13 @@ namespace SchoolAPI.Services.People
                 throw new InvalidOperationException($"Failed to add role: {string.Join(", ", addRoleResult.Errors.Select(e => e.Description))}");
             }
 
-            var student = _mapper.Map<Student>(dto);
+            var student = dto.Adapt<Student>();
             student.UserId = user.Id; // link to Identity user
             student.Status = StudentStatus.Active;
             await _studentRepo.AddAsync(student);
 
             await transaction.CommitAsync();
-            return _mapper.Map<StudentDetailDto>(student);
+            return student.Adapt<StudentDetailDto>();
         }
 
         public async Task<StudentDto?> UpdateStudentAsync(string code, StudentUpdateDto dto)
@@ -175,17 +172,17 @@ namespace SchoolAPI.Services.People
             var student = await _studentRepo.GetByCodeAsync(code);
 
             if(student is null) return null;
-            _mapper.Map(dto, student);
+            dto.Adapt(student);
             await _studentRepo.UpdateAsync(student);
-            return _mapper.Map<StudentDto>(student);
+            return student.Adapt<StudentDto>();
         }
         public async Task<StudentDetailDto?> UpdateStudentWithDetailsAsync(string code, StudentUpdateDetailDto dto)
         {
             var student =  await _studentRepo.GetByCodeWithDetailsAsync(code);
             if(student is null) return null;
-            _mapper.Map(dto, student);
+            dto.Adapt(student);
             await _studentRepo.UpdateAsync(student);
-            return _mapper.Map<StudentDetailDto>(student);
+            return student.Adapt<StudentDetailDto>();
         }
 
         public async Task<bool?> DeleteStudentAsync(string code)
@@ -207,9 +204,9 @@ namespace SchoolAPI.Services.People
         }
 
         public IQueryable<StudentDto> GetQueryable()
-            => _studentRepo.GetQueryable().ProjectTo<StudentDto>(_mapper.ConfigurationProvider);
+            => _studentRepo.GetQueryable().ProjectToType<StudentDto>();
 
         public IQueryable<StudentDetailDto> GetQueryableWithDetails()
-            => _studentRepo.GetQueryableWithDetails().ProjectTo<StudentDetailDto>(_mapper.ConfigurationProvider);
+            => _studentRepo.GetQueryableWithDetails().ProjectToType<StudentDetailDto>();
     }
 }

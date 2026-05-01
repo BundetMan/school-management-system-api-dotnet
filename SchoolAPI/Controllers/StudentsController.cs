@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SchoolAPI.DTOs;
 using SchoolAPI.DTOs.People;
-using SchoolAPI.Models.People;
 using SchoolAPI.Services.People;
 
 namespace SchoolAPI.Controllers;
@@ -16,11 +13,9 @@ namespace SchoolAPI.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _studentService;
-    private readonly IMapper _mapper;
-    public StudentsController(IStudentService studentService, IMapper mapper)
+    public StudentsController(IStudentService studentService)
     {
         _studentService = studentService;
-        _mapper = mapper;
     }
     [HttpGet]
     public async Task<ActionResult<PagedResult<StudentDto>>> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] bool detail = false)
@@ -42,13 +37,13 @@ public class StudentsController : ControllerBase
         {
             var studentDetail = await _studentService.GetByCodeWithDetailsAsync(code);
             if (studentDetail == null) return NotFound();
-            return Ok(_mapper.Map<StudentDetailDto>(studentDetail));
+            return Ok(studentDetail.Adapt<StudentDetailDto>());
         }
         else
         {
             var student = await _studentService.GetCodeAsync(code);
             if (student == null) return NotFound();
-            return Ok(_mapper.Map<StudentDto>(student));
+            return Ok(student.Adapt<StudentDto>());
         }
     }
     [HttpGet("search")]
@@ -80,7 +75,7 @@ public class StudentsController : ControllerBase
     {
         var createdStudent = await _studentService.RegisterStudentAsync(dto);
         if (createdStudent == null) return Conflict(new { Message = "Failed to register student" });
-        var dtoResult = _mapper.Map<StudentDetailDto>(createdStudent);
+        var dtoResult = createdStudent.Adapt<StudentDetailDto>();
         return CreatedAtAction(nameof(GetByCode), new { createdStudent.Code }, dtoResult);
     }
    

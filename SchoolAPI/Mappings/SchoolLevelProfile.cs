@@ -1,18 +1,20 @@
-﻿using AutoMapper;
+﻿
+using Mapster;
 using SchoolAPI.DTOs.School_Structures;
 using SchoolAPI.Models.School_Structure;
 
 namespace SchoolAPI.Mappings
 {
-    public class SchoolLevelProfile : Profile
+    public class SchoolLevelProfile : IRegister
     {
-        public SchoolLevelProfile()
+        public void Register(TypeAdapterConfig config)
         {
-            CreateMap<SchoolLevel, SchoolLevelDto>();
-            CreateMap<SchoolLevelCreateDto, SchoolLevel>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid().ToString()));
+            config.NewConfig<SchoolLevel, SchoolLevelDto>();
 
-            CreateMap<SchoolLevelUpdateDto, SchoolLevel>();
+            config.NewConfig<SchoolLevelCreateDto, SchoolLevel>()
+                .Map(dest => dest.Id, src => Guid.NewGuid().ToString());
+
+            config.NewConfig<SchoolLevelUpdateDto, SchoolLevel>();
         }
     }
 }

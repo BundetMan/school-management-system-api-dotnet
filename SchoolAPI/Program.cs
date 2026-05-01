@@ -1,14 +1,15 @@
-using AutoMapper;
+//using AutoMapper;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
-using SchoolAPI.Mappings;
 using SchoolAPI.Models.People;
 using SchoolAPI.Repositories;
 using SchoolAPI.Repositories.School_Structures;
 using SchoolAPI.Services.People;
 using SchoolAPI.Services.School_Structures;
-using System;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace SchoolAPI
@@ -37,14 +38,12 @@ namespace SchoolAPI
             builder.Services.AddDbContext<SchoolDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolDatabase")));
 
-            #region AutoMapper Configuration
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<StudentProfile>();
-                cfg.AddProfile<SchoolLevelProfile>();
-                cfg.AddProfile<LevelProfile>();
-                cfg.AddProfile<ClassProfile>();
-            });
+            #region mapper Configuration
+            var config = TypeAdapterConfig.GlobalSettings;
+            config.Scan(Assembly.GetExecutingAssembly()); // picks up all IRegister classes
+
+            builder.Services.AddSingleton(config);
+            builder.Services.AddScoped<IMapper, ServiceMapper>();
             #endregion
 
             #region Dependency Injection for Repositories and Services
@@ -74,26 +73,12 @@ namespace SchoolAPI
             .AddDefaultTokenProviders();
             #endregion
 
-
-            //validate configuration(optional, helps catch mapping errors early)
-            //mapperConfig.AssertConfigurationIsValid();
-            try
-            {
-                mapperConfig.AssertConfigurationIsValid();
-            }
-            catch (AutoMapperConfigurationException ex)
-            {
-                Console.WriteLine(ex.Errors.First().ToString());
-            }
-
-            //register IMapper in DI
-            builder.Services.AddSingleton<IMapper>(mapperConfig.CreateMapper());
-
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
 
             #region seeding roles, users
             // ---- Seed roles & users here ----
@@ -103,6 +88,7 @@ namespace SchoolAPI
                 using var scope = app.Services.CreateScope();
                 await SchoolSeeder.SeedAsync(scope.ServiceProvider);
                 await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+                await StudentSeeder.SeedAsync(scope.ServiceProvider);
             }
             #endregion
 

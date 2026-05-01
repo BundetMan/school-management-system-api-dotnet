@@ -10,7 +10,9 @@ namespace SchoolAPI.Repositories
         private readonly SchoolDbContext _dbContext = dbContext;
         public IQueryable<Student> GetQueryable()
         {
-            return _dbContext.Students;
+            return _dbContext.Students
+                .Include(s => s.Level)
+                .Include(s => s.Class);
         }
         public IQueryable<Student> GetQueryableWithDetails()
         {

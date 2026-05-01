@@ -13,6 +13,7 @@ obj/
 
 # Logs
 *.log
+logs/
 
 # Databases
 *.db
@@ -20,9 +21,30 @@ obj/
 *.ldf
 *.sqlite
 
-# ASP.NET Core config secrets
-appsettings.Development.json
+# Secrets
 secrets.json
 
 # Publish
 PublishOutput/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# .NET
+*.cache
+*.dll
+*.exe
+*.pdb
+
+# Test results
+TestResults/
+
+# NuGet
+*.nupkg
+packages/
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
