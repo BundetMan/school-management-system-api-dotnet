@@ -20,7 +20,9 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers(int page = 1, int pageSize = 20)
     {
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var users = await _userManager.Users
+            .OrderBy(u => u.UserName)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

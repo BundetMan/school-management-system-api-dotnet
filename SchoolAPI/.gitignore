@@ -23,6 +23,7 @@ logs/
 
 # Secrets
 secrets.json
+appsettings.json
 
 # Publish
 PublishOutput/

@@ -7,6 +7,7 @@ using SchoolAPI.Data;
 using SchoolAPI.Models.People;
 using SchoolAPI.Repositories;
 using SchoolAPI.Repositories.School_Structures;
+using SchoolAPI.Services;
 using SchoolAPI.Services.People;
 using SchoolAPI.Services.School_Structures;
 using System.Reflection;
@@ -55,6 +56,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<ILevelService, LevelService>();
             builder.Services.AddScoped<IClassRepository, ClassRepository>();
             builder.Services.AddScoped<IClassService, ClassService>();
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
             #endregion
 
