@@ -27,7 +27,6 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
     public DbSet<TeacherSubjectClass> TeacherSubjectClasses { get; set; }
 
     // Registrations
-    public DbSet<RegistrationStatus> RegistrationStatuses { get; set; }
     public DbSet<Registration> Registrations { get; set; }
 
     // Payments & Waitlists
@@ -338,12 +337,11 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(r => r.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(r => r.StudentId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(r => r.ClassId).HasColumnType("varchar(50)").IsRequired();
-            buildAction.Property(r => r.StatusId).HasColumnType("varchar(50)").IsRequired();
-            buildAction.Property(r => r.ApprovedBy).IsRequired(false);
+            buildAction.Property(r => r.Status).HasConversion<string>().IsRequired();
+            buildAction.Property(r => r.ProcessedBy).IsRequired(false);
             buildAction.Property(r => r.RejectedBy).IsRequired(false);
             buildAction.Property(r => r.Notes).HasColumnType("nvarchar(100)");
             buildAction.Property(r => r.CreatedAt).HasColumnType("date").IsRequired();
-            buildAction.Property(r => r.ApprovedAt).HasColumnType("datetime2").IsRequired(false);
             buildAction.Property(r => r.RejectedAt).HasColumnType("datetime2").IsRequired(false);
             buildAction.Property(r => r.RejectionReason).HasColumnType("varchar(255)");
 
@@ -360,40 +358,40 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
                        .OnDelete(DeleteBehavior.Restrict);
 
             // Registration → RegistrationStatus (Many-to-One)
-            buildAction.HasOne(r => r.Status)
-                       .WithMany(s => s.Registrations)
-                       .HasForeignKey(r => r.StatusId)
-                       .OnDelete(DeleteBehavior.Restrict);
+            //buildAction.HasOne(r => r.Status)
+            //           .WithMany(s => s.Registrations)
+            //           .HasForeignKey(r => r.StatusId)
+            //           .OnDelete(DeleteBehavior.Restrict);
 
-            // Registration → User (ApprovedBy) (Many-to-One)
-            buildAction.HasOne(r => r.ApprovedUser)
-                       .WithMany(u => u.ApprovedRegistrations)
-                       .HasForeignKey(r => r.ApprovedBy)
+            // Registration → User (ProcessedBy) (Many-to-One)
+            buildAction.HasOne(r => r.ProcessedUser)
+                       .WithMany(u => u.ProcessedRegistrations)
+                       .HasForeignKey(r => r.ProcessedBy)
                        .OnDelete(DeleteBehavior.Restrict);
 
             // Registration → User (RejectedBy) (Many-to-One)
-            buildAction.HasOne(r => r.RejectedUser)
-                       .WithMany(u => u.RejectedRegistrations)
-                       .HasForeignKey(r => r.RejectedBy)
-                       .OnDelete(DeleteBehavior.Restrict);
+            //buildAction.HasOne(r => r.RejectedUser)
+            //           .WithMany(u => u.RejectedRegistrations)
+            //           .HasForeignKey(r => r.RejectedBy)
+            //           .OnDelete(DeleteBehavior.Restrict);
 
             buildAction.ToTable("Registrations");
         });
 
-        modelBuilder.Entity<RegistrationStatus>(buildAction =>
-        {
-            buildAction.HasKey(rs => rs.Id);
-            buildAction.Property(rs => rs.Id).HasColumnType("varchar(50)").IsRequired();
-            buildAction.Property(rs => rs.Name).HasColumnType("nvarchar(20)").IsRequired();
+        //modelBuilder.Entity<RegistrationStatus>(buildAction =>
+        //{
+        //    buildAction.HasKey(rs => rs.Id);
+        //    buildAction.Property(rs => rs.Id).HasColumnType("varchar(50)").IsRequired();
+        //    buildAction.Property(rs => rs.Name).HasColumnType("nvarchar(20)").IsRequired();
 
-            buildAction.HasIndex(rs => rs.Name).IsUnique();
+        //    buildAction.HasIndex(rs => rs.Name).IsUnique();
 
-            buildAction.HasMany(rs => rs.Registrations)
-                       .WithOne(r => r.Status)
-                       .HasForeignKey(r => r.StatusId)
-                       .OnDelete(DeleteBehavior.Restrict);
-            buildAction.ToTable("RegistrationStatuses");
-        });
+        //    buildAction.HasMany(rs => rs.Registrations)
+        //               .WithOne(r => r.Status)
+        //               .HasForeignKey(r => r.StatusId)
+        //               .OnDelete(DeleteBehavior.Restrict);
+        //    buildAction.ToTable("RegistrationStatuses");
+        //});
         #endregion
         #region Payments & Waitlists
         modelBuilder.Entity<Payment>(buildAction =>

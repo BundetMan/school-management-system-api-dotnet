@@ -9,10 +9,9 @@ namespace SchoolAPI.Models.People
     {
         public string Status { get; set; } = default!;
 
-        public ICollection<Registration> ApprovedRegistrations { get; set; } = default!;
-        public ICollection<Registration> RejectedRegistrations { get; set; } = default!;
-        public ICollection<Payment> ReceivedPayments { get; set; } = default!;
-        public ICollection<Payment> VerifiedPayments { get; set; } = default!;
+        public ICollection<Registration> ProcessedRegistrations { get; set; } = new List<Registration>();
+        public ICollection<Payment> ReceivedPayments { get; set; } = new List<Payment>();
+        public ICollection<Payment> VerifiedPayments { get; set; } = new List<Payment>();
         public Teacher? Teacher { get; set; }
         public Student? Student { get; set; }
     }

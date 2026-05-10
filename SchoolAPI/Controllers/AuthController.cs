@@ -34,8 +34,53 @@ namespace SchoolAPI.Controllers
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
             if (!result.Succeeded) return Unauthorized("Invalid credentials");
 
-            var token = _tokenService.CreateTokenAsync(user);
+            var token = await _tokenService.CreateTokenAsync(user);
             return Ok(new { Token = token });
+        }
+
+        #region No need register for user because we have user controller can use by admin
+        /*
+        [Authorize(Roles = "Admin")]
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(RegisterDto dto)
+        {
+
+            if(await _userManager.FindByEmailAsync(dto.Email) != null)
+            {
+                return Conflict(new {Message = $"Email '{dto.Email}' is already in use."});
+            }
+            if(await _userManager.FindByNameAsync(dto.Username) != null)
+            {
+                return Conflict(new {Message = $"Username '{dto.Username}' is already in use."});
+            }
+
+            var user = new User
+            {
+                UserName = dto.Username,
+                Email = dto.Email,
+                Id = Guid.NewGuid().ToString(),
+                Status = "Active"
+            };
+
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+
+            await _userManager.AddToRoleAsync(user, dto.Role ?? "Student"); // Default to "Student" role if not specified
+
+            var token = await _tokenService.CreateTokenAsync(user);
+            return Ok("User registered successfully");
+        }
+        */
+        #endregion
+
+        [HttpGet("test")]
+        public async Task<ActionResult> Test()
+        {
+            return StatusCode(500);
         }
     }
 }

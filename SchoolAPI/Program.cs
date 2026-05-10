@@ -1,14 +1,18 @@
-//using AutoMapper;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SchoolAPI.Data;
+using SchoolAPI.Middlewares;
 using SchoolAPI.Models.People;
 using SchoolAPI.Repositories;
+using SchoolAPI.Repositories.Registrations;
 using SchoolAPI.Repositories.School_Structures;
 using SchoolAPI.Services;
 using SchoolAPI.Services.People;
+using SchoolAPI.Services.Registrations;
 using SchoolAPI.Services.School_Structures;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -29,15 +33,11 @@ namespace SchoolAPI
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 })
             ;
-            //builder.Services.AddIdentity<User, Role>(options =>
-            //{
-            //    options.User.AllowedUserNameCharacters += " "; // add space
-            //})
-            //.AddEntityFrameworkStores<SchoolDbContext>()
-            //.AddDefaultTokenProviders();
 
             builder.Services.AddDbContext<SchoolDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("SchoolDatabase")));
+
+            
 
             #region mapper Configuration
             var config = TypeAdapterConfig.GlobalSettings;
@@ -56,6 +56,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<ILevelService, LevelService>();
             builder.Services.AddScoped<IClassRepository, ClassRepository>();
             builder.Services.AddScoped<IClassService, ClassService>();
+            builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
+            builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -76,14 +78,62 @@ namespace SchoolAPI
             .AddDefaultTokenProviders();
             #endregion
 
+            #region Authentication configuration
+
+            var JwtKey = builder.Configuration["Jwt:Key"]!;
+            var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+            var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = !string.IsNullOrWhiteSpace(jwtIssuer),
+                        ValidateAudience = !string.IsNullOrWhiteSpace(jwtAudience),
+                        ValidateIssuerSigningKey = true,
+                        RequireExpirationTime = true,
+                        ValidIssuer = jwtIssuer,
+                        ValidAudience = jwtAudience,
+                        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(JwtKey)),
+                    };
+                });
+
+
+            #endregion
+
+            #region configuration authorization policies
+            builder.Services.AddAuthorization(options =>
+            {
+                //options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                //    .RequireAuthenticatedUser()
+                //    .Build();
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireTeacherRole", policy => policy.RequireRole("Teacher"));
+                options.AddPolicy("RequireStudentRole", policy => policy.RequireRole("Student"));
+            });
+
+            #endregion
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            //builder.Services.AddOpenApi();
 
             var app = builder.Build();
 
+            #region Global error handling middleware
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            #endregion
 
-            #region seeding roles, users
+            #region seeding roles, users, students, and school levels
             // ---- Seed roles & users here ----
             bool.TryParse(builder.Configuration["IsDataSeeded"], out bool isDataSeeded);
             if (isDataSeeded)
@@ -100,10 +150,13 @@ namespace SchoolAPI
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                //app.MapOpenApi();
+                //app.MapScalarApiReference();
             }
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

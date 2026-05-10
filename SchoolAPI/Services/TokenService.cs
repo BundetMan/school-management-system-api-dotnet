@@ -43,7 +43,7 @@ public class TokenService : ITokenService
         var key = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 
-        var expiryHours = _config.GetValue<int>("Jwt:ExpiryHours", 8); //expires in 8 hours by default
+        //var expiryHours = _config.GetValue<int>("Jwt:ExpiryHours", 8); //expires in 8 hours by default
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -51,7 +51,7 @@ public class TokenService : ITokenService
             issuer:     _config["Jwt:Issuer"],
             audience:   _config["Jwt:Audience"],
             claims:     claims,
-            expires:    DateTime.Now.AddHours(8),
+            expires:    DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
         );
 

@@ -12,7 +12,7 @@ using SchoolAPI.Data;
 namespace SchoolAPI.Migrations
 {
     [DbContext(typeof(SchoolDbContext))]
-    [Migration("20260131171944_InitialCreate")]
+    [Migration("20260508035457_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -366,6 +366,11 @@ namespace SchoolAPI.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -495,12 +500,6 @@ namespace SchoolAPI.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(50)");
 
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ApprovedBy")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ClassId")
                         .IsRequired()
                         .HasColumnType("varchar(50)");
@@ -511,18 +510,27 @@ namespace SchoolAPI.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessedBy")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("RejectedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RejectedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RejectedUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RejectionReason")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("StatusId")
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StudentId")
                         .IsRequired()
@@ -530,35 +538,15 @@ namespace SchoolAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovedBy");
-
                     b.HasIndex("ClassId");
 
-                    b.HasIndex("RejectedBy");
+                    b.HasIndex("ProcessedBy");
 
-                    b.HasIndex("StatusId");
+                    b.HasIndex("RejectedUserId");
 
                     b.HasIndex("StudentId");
 
                     b.ToTable("Registrations", (string)null);
-                });
-
-            modelBuilder.Entity("SchoolAPI.Models.Registrations.RegistrationStatus", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.ToTable("RegistrationStatuses", (string)null);
                 });
 
             modelBuilder.Entity("SchoolAPI.Models.Schedules.Schedule", b =>
@@ -622,6 +610,11 @@ namespace SchoolAPI.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -783,13 +776,13 @@ namespace SchoolAPI.Migrations
                     b.HasOne("SchoolAPI.Models.School_Structure.Class", "Class")
                         .WithMany("Students")
                         .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SchoolAPI.Models.School_Structure.Level", "Level")
                         .WithMany("Students")
                         .HasForeignKey("LevelId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SchoolAPI.Models.People.User", "User")
@@ -818,27 +811,20 @@ namespace SchoolAPI.Migrations
 
             modelBuilder.Entity("SchoolAPI.Models.Registrations.Registration", b =>
                 {
-                    b.HasOne("SchoolAPI.Models.People.User", "ApprovedUser")
-                        .WithMany("ApprovedRegistrations")
-                        .HasForeignKey("ApprovedBy")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SchoolAPI.Models.School_Structure.Class", "Class")
                         .WithMany("Registrations")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SchoolAPI.Models.People.User", "RejectedUser")
-                        .WithMany("RejectedRegistrations")
-                        .HasForeignKey("RejectedBy")
+                    b.HasOne("SchoolAPI.Models.People.User", "ProcessedUser")
+                        .WithMany("ProcessedRegistrations")
+                        .HasForeignKey("ProcessedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SchoolAPI.Models.Registrations.RegistrationStatus", "Status")
-                        .WithMany("Registrations")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("SchoolAPI.Models.People.User", "RejectedUser")
+                        .WithMany()
+                        .HasForeignKey("RejectedUserId");
 
                     b.HasOne("SchoolAPI.Models.People.Student", "Student")
                         .WithMany("Registrations")
@@ -846,13 +832,11 @@ namespace SchoolAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ApprovedUser");
-
                     b.Navigation("Class");
 
-                    b.Navigation("RejectedUser");
+                    b.Navigation("ProcessedUser");
 
-                    b.Navigation("Status");
+                    b.Navigation("RejectedUser");
 
                     b.Navigation("Student");
                 });
@@ -933,22 +917,15 @@ namespace SchoolAPI.Migrations
 
             modelBuilder.Entity("SchoolAPI.Models.People.User", b =>
                 {
-                    b.Navigation("ApprovedRegistrations");
+                    b.Navigation("ProcessedRegistrations");
 
                     b.Navigation("ReceivedPayments");
-
-                    b.Navigation("RejectedRegistrations");
 
                     b.Navigation("Student");
 
                     b.Navigation("Teacher");
 
                     b.Navigation("VerifiedPayments");
-                });
-
-            modelBuilder.Entity("SchoolAPI.Models.Registrations.RegistrationStatus", b =>
-                {
-                    b.Navigation("Registrations");
                 });
 
             modelBuilder.Entity("SchoolAPI.Models.School_Structure.Class", b =>

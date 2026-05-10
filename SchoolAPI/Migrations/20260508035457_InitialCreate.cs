@@ -12,18 +12,6 @@ namespace SchoolAPI.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "RegistrationStatuses",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(50)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RegistrationStatuses", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RoleClaims",
                 columns: table => new
                 {
@@ -207,6 +195,7 @@ namespace SchoolAPI.Migrations
                     Id = table.Column<string>(type: "varchar(50)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     Capacity = table.Column<int>(type: "int", nullable: false, defaultValue: 50),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     LevelId = table.Column<string>(type: "varchar(50)", nullable: false)
                 },
                 constraints: table =>
@@ -293,6 +282,7 @@ namespace SchoolAPI.Migrations
                     FullName = table.Column<string>(type: "nvarchar(100)", nullable: false),
                     LatinName = table.Column<string>(type: "nvarchar(100)", nullable: false),
                     Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
                     PlaceOfBirth = table.Column<string>(type: "varchar(100)", nullable: false),
                     BackgroundStudy = table.Column<string>(type: "nvarchar(100)", nullable: false),
@@ -320,13 +310,13 @@ namespace SchoolAPI.Migrations
                         column: x => x.ClassId,
                         principalTable: "Classes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Students_Levels_LevelId",
                         column: x => x.LevelId,
                         principalTable: "Levels",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Students_Users_UserId",
                         column: x => x.UserId,
@@ -416,10 +406,11 @@ namespace SchoolAPI.Migrations
                     Id = table.Column<string>(type: "varchar(50)", nullable: false),
                     StudentId = table.Column<string>(type: "varchar(50)", nullable: false),
                     ClassId = table.Column<string>(type: "varchar(50)", nullable: false),
-                    StatusId = table.Column<string>(type: "varchar(50)", nullable: false),
-                    ApprovedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ApprovedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RejectedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProcessedBy = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProcessedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RejectedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RejectedUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     RejectedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RejectionReason = table.Column<string>(type: "varchar(255)", nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(100)", nullable: true),
@@ -435,29 +426,22 @@ namespace SchoolAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Registrations_RegistrationStatuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "RegistrationStatuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Registrations_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Registrations_Users_ApprovedBy",
-                        column: x => x.ApprovedBy,
+                        name: "FK_Registrations_Users_ProcessedBy",
+                        column: x => x.ProcessedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Registrations_Users_RejectedBy",
-                        column: x => x.RejectedBy,
+                        name: "FK_Registrations_Users_RejectedUserId",
+                        column: x => x.RejectedUserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -537,35 +521,24 @@ namespace SchoolAPI.Migrations
                 column: "VerifiedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Registrations_ApprovedBy",
-                table: "Registrations",
-                column: "ApprovedBy");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Registrations_ClassId",
                 table: "Registrations",
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Registrations_RejectedBy",
+                name: "IX_Registrations_ProcessedBy",
                 table: "Registrations",
-                column: "RejectedBy");
+                column: "ProcessedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Registrations_StatusId",
+                name: "IX_Registrations_RejectedUserId",
                 table: "Registrations",
-                column: "StatusId");
+                column: "RejectedUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Registrations_StudentId",
                 table: "Registrations",
                 column: "StudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RegistrationStatuses_Name",
-                table: "RegistrationStatuses",
-                column: "Name",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schedules_ClassId",
@@ -695,9 +668,6 @@ namespace SchoolAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Waitlists");
-
-            migrationBuilder.DropTable(
-                name: "RegistrationStatuses");
 
             migrationBuilder.DropTable(
                 name: "Subjects");

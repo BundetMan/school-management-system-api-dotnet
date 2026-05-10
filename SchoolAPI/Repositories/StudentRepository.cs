@@ -21,7 +21,7 @@ namespace SchoolAPI.Repositories
                 .Include(s => s.Class)
                 .Include(s => s.User)
                 .Include(s => s.Payments)
-                .Include(s => s.Registrations).ThenInclude(r => r.Status)
+                .Include(s => s.Registrations)
                 .Include(s => s.Waitlists).ThenInclude(w => w.Class);
         }
         public async Task<Student?> GetByCodeAsync(string code)

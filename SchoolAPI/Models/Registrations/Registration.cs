@@ -9,23 +9,18 @@ namespace SchoolAPI.Models.Registrations
     {
         public string Id { get; set; } = default!;
 
-        [Required]
         public string StudentId { get; set; } = default!;
         public Student Student { get; set; } = default!;
 
-        [Required]
         public string ClassId { get; set; } = default!;
         public Class Class { get; set; } = default!;
 
-        [Required]
-        public string StatusId { get; set; } = default!;
         public RegistrationStatus Status { get; set; } = default!;
 
         //approve
-        [Required]        
-        public string? ApprovedBy { get; set; } = default!;
-        public User? ApprovedUser { get; set; } = default!;
-        public DateTime? ApprovedAt { get; set; }
+        public string? ProcessedBy { get; set; }
+        public User? ProcessedUser { get; set; }
+        public DateTime? ProcessedAt { get; set; }
 
         //reject
         public string? RejectedBy { get; set; }
