@@ -1,13 +1,20 @@
-﻿using SchoolAPI.Models.School_Structure;
+﻿using SchoolAPI.DTOs.School_Structures;
+using SchoolAPI.Models.School_Structure;
 
 namespace SchoolAPI.Services.School_Structures
 {
     public interface IClassService
     {
-        Task<IEnumerable<Class>> GetClassesAsync();
-        Task<Class?> GetClassByIdAsync(string id);
-        Task<Class?> CreateClassAsync(Class cls);
-        Task<Class?> UpdateClassAsync(Class cls);
+        Task<IEnumerable<ClassDto>> GetClassesAsync();
+        Task<ClassDto?> GetClassByIdAsync(string id);
+        Task<IEnumerable<ClassDto>> GetClassesByLevelIdAsync(string levelId);  // filter by level
+        Task<IEnumerable<ClassDto>> GetAvailableClassesAsync();
+
+        Task<ClassDto?> CreateClassAsync(ClassCreateDto dto);
+        Task<ClassDto?> UpdateClassAsync(string id, ClassUpdateDto dto);
         Task<bool> DeleteClassAsync(string id);
+
+        Task<bool> IsClassFullAsync(string id);
+        Task<int> GetAvailableSeatsAsync(string id);
     }
 }

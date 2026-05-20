@@ -6,9 +6,11 @@ namespace SchoolAPI.Repositories.School_Structures
     {
         Task<IEnumerable<Class>> GetAllAsync();
         Task<Class?> GetByIdAsync(string id);
-        Task AddAsync(Class cls);
+        Task<IEnumerable<Class>> GetByLevelIdAsync(string levelId);
+        Task<IEnumerable<Class>> GetAvailableClassesAsync();
+        Task<Class> AddAsync(Class cls);
         Task UpdateAsync(Class cls);
-        Task DeleteAsync(string id);
+        Task DeleteAsync(Class cls);
     }
 }
 

@@ -2,19 +2,16 @@
 
 namespace SchoolAPI.DTOs.Registration;
 
-public record RegistrationDto(
+public record ManualRegistrationEnrollmentDto(
     string Id,
-    string StudentCode,
+    string StudentId,
     string StudentName,
     string ClassId,
     string ClassName,
     RegistrationStatus Status,
     string? Notes,
-    string? ProcessedByName,
-    string? EnrolledByName,
+    string? ProcessedBy,
     DateTime? ProcessedAt,
-    string? RejectedByName,
-    DateTime? RejectedAt,
-    string? RejectionReason,
+    string EnrollmentByUserId,
     DateTime CreatedAt
 );

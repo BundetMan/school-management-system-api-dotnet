@@ -10,5 +10,15 @@ namespace SchoolAPI.DTOs.School_Structures
         public ClassStatus Status { get; set; } = ClassStatus.Active;
         public string LevelId { get; set; } = string.Empty;
         public string LevelName { get; set; } = string.Empty;
+        public string SchoolLevelName { get; set; } = default!;
+
+        // Availability
+        public int EnrolledCount { get; set; }
+        public int AvailableSeats { get; set; }
+        public bool IsFull { get; set; }
+
+        // Counts
+        public int SubjectCount { get; set; }
+        public int WaitlistCount { get; set; }
     }
 }

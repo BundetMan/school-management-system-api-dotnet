@@ -1,13 +1,13 @@
-﻿using SchoolAPI.Models.School_Structure;
+﻿using SchoolAPI.DTOs.School_Structures;
 
 namespace SchoolAPI.Services.School_Structures
 {
     public interface ILevelService
     {
-        Task<IEnumerable<Level>> GetLevelsAsync();
-        Task<Level?> GetLevelByIdAsync(string id);
-        Task<Level?> CreateLevelAsync(Level level);
-        Task<Level?> UpdateLevelAsync(Level level);
+        Task<IEnumerable<LevelDto>> GetLevelsAsync();
+        Task<LevelDto?> GetLevelByIdAsync(string id);
+        Task<LevelDto?> CreateLevelAsync(LevelCreateDto dto);
+        Task<LevelDto?> UpdateLevelAsync(string id, LevelUpdateDto dto);
         Task<bool> DeleteLevelAsync(string id);
     }
 

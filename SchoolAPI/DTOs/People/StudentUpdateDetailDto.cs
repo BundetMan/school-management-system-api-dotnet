@@ -16,7 +16,5 @@ namespace SchoolAPI.DTOs.People
         public string MotherName { get; set; } = null!;
         public string Contact { get; set; } = null!;
         public string Address { get; set; } = null!;
-        public string LevelId { get; set; } = null!;
-        public string ClassId { get; set; } = null!;
     }
 }

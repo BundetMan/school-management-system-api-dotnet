@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.DTOs.Registration;
 using SchoolAPI.Models.Registrations;
 
 namespace SchoolAPI.Repositories.Registrations;
@@ -12,57 +13,53 @@ public class RegistrationRepository : IRegistrationRepository
         _context = context;
     }
 
-    public async Task<Registration?> GetByIdAsync(string id)
-        => await _context.Registrations
+    public IQueryable<Registration> GetQueryable()
+        => _context.Registrations.AsNoTracking();
+
+    public IQueryable<Registration> GetQueryableDetails()
+        => _context.Registrations
                 .Include(r => r.Student)
                 .Include(r => r.Class)
                 .Include(r => r.ProcessedUser)
                 .Include(r => r.RejectedUser)
+                .Include(r => r.EnrolledUser)
+                .AsNoTracking();
+    public async Task<Registration?> GetByIdAsync(string id)
+        => await GetQueryableDetails()
                 .FirstOrDefaultAsync(r => r.Id == id);
 
     public async Task<IEnumerable<Registration>> GetAllAsync()
-        => await _context.Registrations
-                .Include(r => r.Student)
-                .Include(r => r.Class)
-                .ToListAsync();
+        => await GetQueryableDetails().ToListAsync();
 
     public async Task<IEnumerable<Registration>> GetByStudentIdAsync(string studentId)
-        => await _context.Registrations
+        => await GetQueryableDetails()
                 .Where(r => r.StudentId == studentId)
-                .Include(r => r.Class)
-                .Include(r => r.Student)
                 .ToListAsync();
 
     public async Task<IEnumerable<Registration>> GetByClassIdAsync(string classId)
-        => await _context.Registrations
+        => await GetQueryableDetails()
                 .Where(r => r.ClassId == classId)
-                .Include(r => r.Student)
-                .Include(r => r.Class)
                 .ToListAsync();
 
     public async Task<IEnumerable<Registration>> GetByStatusAsync(RegistrationStatus status)
-        => await _context.Registrations
-                    .Where(r => r.Status == status)
-                    .Include(r => r.Student) 
-                    .Include(r => r.Class)
-                    .ToListAsync();
+        => await GetQueryableDetails()
+                .Where(r => r.Status == status)
+                .ToListAsync();
 
     public async Task<bool> ExistsAsync(string studentId, string classId)
         => await _context.Registrations
                 .AnyAsync(r => r.StudentId == studentId && r.ClassId == classId);
 
-    public async Task<Registration> CreateAsync(Registration registration)
+    public async Task CreateAsync(Registration registration)
     {
          _context.Registrations.Add(registration);
         await _context.SaveChangesAsync();
-        return registration;
     }
 
-    public async Task<Registration> UpdateAsync(Registration registration)
+    public async Task UpdateAsync(Registration registration)
     {
         _context.Registrations.Update(registration);
         await _context.SaveChangesAsync();
-        return registration;
     }
 
     public async Task<bool> DeleteAsync(string id)

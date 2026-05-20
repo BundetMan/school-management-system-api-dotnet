@@ -1,4 +1,6 @@
-﻿using SchoolAPI.Models.School_Structure;
+﻿using Mapster;
+using SchoolAPI.DTOs.School_Structures;
+using SchoolAPI.Models.School_Structure;
 using SchoolAPI.Repositories.School_Structures;
 
 namespace SchoolAPI.Services.School_Structures
@@ -8,27 +10,41 @@ namespace SchoolAPI.Services.School_Structures
         private readonly ILevelRepository _repo = repo;
         private readonly ISchoolLevelRepository _schoolLevelRepo = schoolLevelRepo;
 
-        public async Task<IEnumerable<Level>> GetLevelsAsync()
-            => await _repo.GetAllAsync();
-
-        public async Task<Level?> GetLevelByIdAsync(string id)
-            => await _repo.GetByIdAsync(id);
-
-        public async Task<Level?> CreateLevelAsync(Level level)
+        public async Task<IEnumerable<LevelDto>> GetLevelsAsync()
         {
-            // Validate FK
-            var schoolLevel = await _schoolLevelRepo.GetByIdAsync(level.SchoolLevelId);
-            if (schoolLevel == null) return null;
-
-            //level.SchoolLevel = schoolLevel;
-            await _repo.AddAsync(level);
-            return level;
+            var levels = await _repo.GetAllAsync();
+            return levels.Adapt<IEnumerable<LevelDto>>();
         }
 
-        public async Task<Level?> UpdateLevelAsync(Level level)
+        public async Task<LevelDto?> GetLevelByIdAsync(string id)
         {
-            await _repo.UpdateAsync(level);
-            return level;
+            var level = await _repo.GetByIdAsync(id);
+            return level?.Adapt<LevelDto>();
+        }
+
+        public async Task<LevelDto?> CreateLevelAsync(LevelCreateDto dto)
+        {
+            // Validate FK
+            var schoolLevel = await _schoolLevelRepo.GetByIdAsync(dto.SchoolLevelId);
+            if (schoolLevel == null) return null;
+
+            var level = dto.Adapt<Level>();
+            //level.SchoolLevel = schoolLevel;
+            await _repo.AddAsync(level);
+
+            return level.Adapt<LevelDto>();
+        }
+
+        public async Task<LevelDto?> UpdateLevelAsync(string id, LevelUpdateDto dto)
+        {
+            var existingLevel = await _repo.GetByIdAsync(id);
+            if (existingLevel == null) return null;
+
+            dto.Adapt(existingLevel);
+
+            var updated = _repo.UpdateAsync(existingLevel);
+
+            return updated.Adapt<LevelDto>();
         }
 
         public async Task<bool> DeleteLevelAsync(string id)

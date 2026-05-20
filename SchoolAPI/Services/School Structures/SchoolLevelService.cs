@@ -1,4 +1,6 @@
-﻿using SchoolAPI.Models.School_Structure;
+﻿using Mapster;
+using SchoolAPI.DTOs.School_Structures;
+using SchoolAPI.Models.School_Structure;
 using SchoolAPI.Repositories.School_Structures;
 namespace SchoolAPI.Services.School_Structures
 {
@@ -11,36 +13,51 @@ namespace SchoolAPI.Services.School_Structures
             _repo = repo;
         }
 
-        public async Task<IEnumerable<SchoolLevel>> GetLevelsAsync()
-            => await _repo.GetAllAsync();
-
-        public async Task<SchoolLevel?> GetLevelByIdAsync(string id)
-            => await _repo.GetByIdAsync(id);
-
-        public async Task<SchoolLevel?> CreateLevelAsync(SchoolLevel level)
+        public async Task<IReadOnlyList<SchoolLevelDto>> GetSchoolLevelsAsync()
         {
-            await _repo.AddAsync(level);
-            return level;
+            var levels = await _repo.GetAllAsync();
+            return levels.Adapt<IReadOnlyList<SchoolLevelDto>>();
         }
 
-        public async Task<SchoolLevel?> UpdateLevelAsync(SchoolLevel level)
+        public async Task<SchoolLevelDto?> GetSchoolLevelByIdAsync(string id)
         {
-            await _repo.UpdateAsync(level);
-            return level;
+            var schoolLevel = await _repo.GetByIdAsync(id);
+            return schoolLevel?.Adapt<SchoolLevelDto?>();
         }
 
-        public async Task<bool> DeleteLevelAsync(string id)
+
+        public async Task<SchoolLevelDto> CreateSchoolLevelAsync(SchoolLevelCreateDto dto)
+        {
+            var schoolLevel = dto.Adapt<SchoolLevel>();
+            var created = await _repo.AddAsync(schoolLevel);
+            return created.Adapt<SchoolLevelDto>();
+        }
+
+        public async Task<SchoolLevelDto?> UpdateSchoolLevelAsync(string id, SchoolLevelUpdateDto dto)
+        {
+            var schoolLevel = await _repo.GetByIdAsync(id);
+            if (schoolLevel == null) return null;
+
+            schoolLevel.Name = dto.Name;
+
+            await _repo.UpdateAsync(schoolLevel);
+            return schoolLevel.Adapt<SchoolLevelDto?>();
+        }
+
+        public async Task<bool> DeleteSchoolLevelAsync(string id)
         {
             var existing = await _repo.GetByIdAsync(id);
             if (existing == null) return false;
-            await _repo.DeleteAsync(id);
+
+            await _repo.DeleteAsync(existing);
+
             return true;
         }
 
-        public async Task<IEnumerable<SchoolLevel>> GetLevelsWithDetailAsync()
-            => await _repo.GetAllWithDetailsAsync();
-
-        public Task<SchoolLevel?> GetLevelByIdWithDetailAsync(string id)
-            => _repo.GetByIdWithDetailsAsync(id);
+        public async Task<SchoolLevelDto?> GetSchoolLevelByIdWithDetailAsync(string id)
+        {
+            var schoolLevel = await _repo.GetByIdWithDetailsAsync(id);
+            return schoolLevel?.Adapt<SchoolLevelDto?>();
+        }
     }
 }

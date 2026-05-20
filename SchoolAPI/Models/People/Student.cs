@@ -35,12 +35,6 @@ namespace SchoolAPI.Models.People
 
         public string Address { get; set; } = default!;
 
-        public string LevelId { get; set; } = default!;
-        public Level Level { get; set; } = default!;
-
-        public string ClassId { get; set; } = default!;
-        public Class Class { get; set; } = default!;
-
         public string UserId { get; set; } = default!;
         public User User { get; set; } = default!;
 

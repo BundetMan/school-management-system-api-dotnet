@@ -28,21 +28,15 @@ namespace SchoolAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<ClassDto>> CreateClass(ClassCreateDto dto)
         {
-            var cls = dto.Adapt<Class>();
-            var created = await _service.CreateClassAsync(cls);
-            if (created == null) return BadRequest("Invalid LevelId");
+            var created = await _service.CreateClassAsync(dto);
+            if(created == null) return BadRequest("Invalid LevelId");
 
-            var result = created.Adapt<ClassDto>();
-            return CreatedAtAction(nameof(GetClass), new { id = created.Id }, result);
+            return CreatedAtAction(nameof(GetClass), new { id = created.Id }, created.Adapt<ClassDto>());
         }
         [HttpPut("{id}")]
         public async Task<ActionResult<ClassDto>> UpdateClass(string id, ClassUpdateDto dto)
         {
-            var existing = await _service.GetClassByIdAsync(id);
-            if (existing == null) return NotFound();
-
-            dto.Adapt(existing);
-            var updated = await _service.UpdateClassAsync(existing);
+            var updated = await _service.UpdateClassAsync(id, dto);
             return Ok(updated.Adapt<ClassDto>());
         }
         [HttpDelete("{id}")]

@@ -26,7 +26,7 @@ public class StudentSeeder
 
         var faker = new Faker();
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 50; i++)
         {
             var fullName = faker.Name.FullName();
             var email = faker.Internet.Email();
@@ -60,8 +60,6 @@ public class StudentSeeder
                 MotherName = faker.Name.FullName(),
                 Contact = faker.Phone.PhoneNumber(),
                 Address = faker.Address.FullAddress(),
-                LevelId = faker.PickRandom(levels).Id,
-                ClassId = faker.PickRandom(classes).Id,
                 UserId = user.Id
             };
 
@@ -69,6 +67,6 @@ public class StudentSeeder
         }
 
         await dbContext.SaveChangesAsync();
-        Console.WriteLine("Seeded 100 students with users.");
+        Console.WriteLine("Seeded 50 students with users.");
     }
 }

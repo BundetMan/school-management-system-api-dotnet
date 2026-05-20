@@ -18,33 +18,19 @@ public class StudentsController : ControllerBase
         _studentService = studentService;
     }
     [HttpGet]
-    public async Task<ActionResult<PagedResult<StudentDto>>> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] bool detail = false)
+    public async Task<ActionResult<PagedResult<StudentDto>>> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
-        if (detail) 
-        {
-            var studentsWithDetails = await _studentService.GetAllWithDetailsAsync(page, pageSize);
-            return Ok(studentsWithDetails);
-        }
         var students = await _studentService.GetAllAsync(page, pageSize);
         return Ok(students);
     }
     [HttpGet("{code}")]
-    public async Task<IActionResult> GetByCode(string code, bool detail = false)
+    public async Task<IActionResult> GetByCode(string code)
     {
-        if (detail)
-        {
-            var studentDetail = await _studentService.GetByCodeWithDetailsAsync(code);
-            if (studentDetail == null) return NotFound();
-            return Ok(studentDetail.Adapt<StudentDetailDto>());
-        }
-        else
-        {
-            var student = await _studentService.GetCodeAsync(code);
-            if (student == null) return NotFound();
-            return Ok(student.Adapt<StudentDto>());
-        }
+        var student = await _studentService.GetCodeAsync(code);
+        if (student == null) return NotFound($"Student with code '{code}' not found.");
+        return Ok(student);
     }
     [HttpGet("search")]
     public async Task<IActionResult> Search(
@@ -56,18 +42,6 @@ public class StudentsController : ControllerBase
         )
     {
         var result = await _studentService.SearchAsync(code, latinName, fullName, page, pageSize);
-        return Ok(result);
-    }
-    [HttpGet("search/detail")]
-    public async Task<IActionResult> SearchWithDetails(
-        string? code = null,
-        string? latinName = null,
-        string? fullName = null,
-        int page = 1,
-        int pageSize = 10
-        )
-    {
-        var result = await _studentService.SearchWithDetailsAsync(code, latinName, fullName, page, pageSize);
         return Ok(result);
     }
     [HttpPost]
@@ -87,7 +61,7 @@ public class StudentsController : ControllerBase
         if (updatedStudent is null) return NotFound($"Student with code '{code}' not found."); 
         return Ok(updatedStudent);
     }
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequireAdminRole")]
     [HttpPut("{code}/detail")]
     public async Task<IActionResult> UpdateWithDetails(string code, StudentUpdateDetailDto dto)
     {
@@ -96,21 +70,13 @@ public class StudentsController : ControllerBase
         if (updatedStudent is null) return NotFound($"Student with code '{code}' not found.");
         return Ok(updatedStudent);
     }
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = "RequireAdminRole")]
     [HttpDelete("{code}")]
-    public async Task<IActionResult> Delete(string code)
+    public async Task<IActionResult> Delete(string code, [FromQuery] bool soft = false)
     {
-        var result = await _studentService.DeleteStudentAsync(code);
+        var result = await _studentService.DeleteStudentAsync(code, soft);
         if (result == null) return NotFound($"Student with code '{code}' not found.");
         if (result == false) return Conflict(new { Message = "Failed to delete student" });
-        return NoContent();
-    }
-    [HttpDelete("{code}/softDelete")]
-    public async Task<IActionResult> SoftDelete(string code)
-    {
-        var result = await _studentService.SoftDeleteAsync(code);
-        if (result == null) return NotFound($"Student with code '{code}' not found.");
-        if (result == false) return Conflict(new { Message = "Failed to soft delete student" });
         return NoContent();
     }
 }

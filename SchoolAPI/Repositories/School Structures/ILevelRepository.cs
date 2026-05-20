@@ -6,7 +6,7 @@ namespace SchoolAPI.Repositories.School_Structures
     {
         Task<IEnumerable<Level>> GetAllAsync();
         Task<Level?> GetByIdAsync(string id);
-        Task AddAsync(Level level);
+        Task<Level?> AddAsync(Level level);
         Task UpdateAsync(Level level);
         Task DeleteAsync(string id);
     }

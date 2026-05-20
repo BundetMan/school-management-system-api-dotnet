@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
 using SchoolAPI.DTOs;
 using SchoolAPI.DTOs.People;
+using SchoolAPI.DTOs.Registration;
 using SchoolAPI.Models.People;
+using SchoolAPI.Models.Registrations;
 using SchoolAPI.Repositories;
 
 namespace SchoolAPI.Services.People
@@ -26,48 +28,75 @@ namespace SchoolAPI.Services.People
             _dbContext = dbContext;
         }
 
-        public async Task<StudentDto?> GetCodeAsync(string id)
+        public async Task<StudentDetailDto?> GetCodeAsync(string code)
         {
-            var student = await _studentRepo.GetByCodeAsync(id);
-            return student?.Adapt<StudentDto>();
-        }
+            return await _dbContext.Students
+                    .Where(s => s.Code == code)
+                    .Select(s => new StudentDetailDto
+                    (
+                        s.Id.ToString(),
+                        s.Code,
+                        s.FullName,
+                        s.LatinName,
+                        s.Gender,
+                        s.Status,
+                        s.DateOfBirth,
+                        s.PlaceOfBirth,
+                        s.BackgroundStudy,
+                        s.FatherName,
+                        s.MotherName,
+                        s.Contact,
+                        s.Address,
 
-        public async Task<StudentDetailDto?> GetByCodeWithDetailsAsync(string id)
-        {
-            var student = await _studentRepo.GetByCodeWithDetailsAsync(id);
-            return student?.Adapt<StudentDetailDto>();
-        }
+                        s.Payments.Select(p => new PaymentSummaryDto(
+                            p.Id.ToString(),
+                            p.Amount,
+                            p.PaidAt,
+                            p.Status.ToString()
+                        )),
+                        s.Registrations.Select(r => new RegistrationSummaryDto(
+                            r.Id.ToString(),
+                            r.Class.Name,
+                            r.Status.ToString(),
+                            r.CreatedAt
+                        )),
+                        s.Waitlists.Select(w => new WaitlistSummaryDto(
+                            w.Id.ToString(),
+                            w.Class.Name,
+                            w.RequestedAt
+                        ))
+                    ))
+                    .FirstOrDefaultAsync();
+                    }
 
         public async Task<PagedResult<StudentDto>> GetAllAsync(int page = 1, int pageSize = 30)
         {
-            var (students, totalCount) = await _studentRepo.GetPageAsync(page, pageSize);
+            var queryable = _studentRepo.GetQueryable();
+            var totalCount = await queryable.CountAsync();
+
+            var students = await queryable
+                .OrderBy(x => x.Code)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ProjectToType<StudentDto>()
+                .ToListAsync();
+
             return new PagedResult<StudentDto>(
-                students.Adapt<IReadOnlyList<StudentDto>>(),
-                totalCount,
-                page,
-                pageSize
-            );
-        }
-        public async Task<PagedResult<StudentDetailDto>> GetAllWithDetailsAsync(int page = 1, int pageSize = 30)
-        {
-            var (students, totalCount) = await _studentRepo.GetPageWithDetailsAsync(page, pageSize);
-            return new PagedResult<StudentDetailDto>(
-                students.Adapt<IReadOnlyList<StudentDetailDto>>(),
-                totalCount,
-                page,
-                pageSize
-            );
-
+                    students,
+                    totalCount,
+                    page,
+                    pageSize
+                );
         }
 
-        public async Task<PagedResult<StudentDto>> SearchAsync(
+        public async Task<PagedResult<StudentSummaryDto>> SearchAsync(
             string? code,
             string? latinName,
             string? fullName,
             int page,
             int pageSize)
         {
-            IQueryable<Student> queryable = _studentRepo.GetQueryable();
+            IQueryable<Student> queryable = _dbContext.Students.AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(code))
                 queryable = queryable.Where(s => s.Code == code);
@@ -78,54 +107,40 @@ namespace SchoolAPI.Services.People
             if (!string.IsNullOrWhiteSpace(fullName))
                 queryable = queryable.Where(s => s.FullName.Contains(fullName));
 
-            var totalCount = await queryable.CountAsync();
+            var countTask = await queryable.CountAsync();
 
-            var students = await queryable
+            var dataTask = await queryable
+                .OrderBy(s => s.Code)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
-            var dtoList = students.Adapt<IReadOnlyList<StudentDto>>();
+                .Select(s => new StudentSummaryDto(
+                    s.Id.ToString(),
+                    s.Code,
+                    s.FullName,
+                    s.LatinName,
+                    s.Gender,
+                    s.Status,
 
-            return new PagedResult<StudentDto>(dtoList, totalCount, page, pageSize);
-        }
+                    // just the latest active registration class name
+                    s.Registrations
+                        .Where(r => r.Status == RegistrationStatus.Approved)
+                        .OrderByDescending(r => r.CreatedAt)
+                        .Select(r => r.Class.Name)
+                        .FirstOrDefault(),
 
-        public async Task<PagedResult<StudentDetailDto>> SearchWithDetailsAsync(
-            string? code,
-            string? latinName,
-            string? fullName,
-            int page,
-            int pageSize)
-        {
-            IQueryable<Student> queryable = _studentRepo.GetQueryableWithDetails();
-
-            if (!string.IsNullOrWhiteSpace(code))
-                queryable = queryable.Where(s => s.Code == code);
-            if (!string.IsNullOrWhiteSpace(latinName))
-                queryable = queryable.Where(s => s.LatinName.Contains(latinName));
-            if (!string.IsNullOrWhiteSpace(fullName))
-                queryable = queryable.Where(s => s.FullName.Contains(fullName));
-
-            var totalCount = await queryable.CountAsync();
-            var students = await queryable
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                    // just the latest registration status
+                    s.Registrations
+                        .OrderByDescending(r => r.CreatedAt)
+                        .Select(r => r.Status.ToString())
+                        .FirstOrDefault()
+                ))
                 .ToListAsync();
 
-            var dtoList = students.Adapt<IReadOnlyList<StudentDetailDto>>();
-            return new PagedResult<StudentDetailDto>(dtoList, totalCount, page, pageSize);
-        }
-
-        public async Task<PagedResult<StudentDto>> GetPageAsync(int page = 1, int pageSize = 30)
-        {
-            var (queryable, count) = await _studentRepo.GetPageAsync(page, pageSize);
-
-            var dtoItems = queryable.Adapt<IReadOnlyList<StudentDto>>();
-
-            return new PagedResult<StudentDto>(
-                Items: dtoItems,
-                TotalCount: count,
-                Page: page,
-                PageSize: pageSize
+            return new PagedResult<StudentSummaryDto>(
+                dataTask,
+                countTask,
+                page,
+                pageSize
             );
         }
 
@@ -176,37 +191,31 @@ namespace SchoolAPI.Services.People
             await _studentRepo.UpdateAsync(student);
             return student.Adapt<StudentDto>();
         }
+
         public async Task<StudentDetailDto?> UpdateStudentWithDetailsAsync(string code, StudentUpdateDetailDto dto)
         {
-            var student =  await _studentRepo.GetByCodeWithDetailsAsync(code);
-            if(student is null) return null;
+            var student = await _studentRepo.GetByCodeAsync(code);
+            if (student is null) return null;
             dto.Adapt(student);
             await _studentRepo.UpdateAsync(student);
             return student.Adapt<StudentDetailDto>();
         }
 
-        public async Task<bool?> DeleteStudentAsync(string code)
+        public async Task<bool?> DeleteStudentAsync(string code , bool soft = false)
         {
             var student = await _studentRepo.GetByCodeAsync(code);
             if(student is null) return null;
-            await _studentRepo.DeleteAsync(student);
-            await _userManager.DeleteAsync(student.User!);
+            if(soft)
+            {
+                student.Status = StudentStatus.Inactive;
+                await _studentRepo.UpdateAsync(student);
+            }
+            else
+            {
+                await _studentRepo.DeleteAsync(student);
+                await _userManager.DeleteAsync(student.User!);
+            }
             return true;
         }
-
-        public async Task<bool?> SoftDeleteAsync(string code)
-        {
-            var student = await _studentRepo.GetByCodeAsync(code);
-            if(student is null) return null;
-            student.Status = StudentStatus.Inactive;
-            await _studentRepo.UpdateAsync(student);
-            return true;
-        }
-
-        public IQueryable<StudentDto> GetQueryable()
-            => _studentRepo.GetQueryable().ProjectToType<StudentDto>();
-
-        public IQueryable<StudentDetailDto> GetQueryableWithDetails()
-            => _studentRepo.GetQueryableWithDetails().ProjectToType<StudentDetailDto>();
     }
 }

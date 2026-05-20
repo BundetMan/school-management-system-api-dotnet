@@ -8,9 +8,11 @@ using SchoolAPI.Data;
 using SchoolAPI.Middlewares;
 using SchoolAPI.Models.People;
 using SchoolAPI.Repositories;
+using SchoolAPI.Repositories.Enrollments;
 using SchoolAPI.Repositories.Registrations;
 using SchoolAPI.Repositories.School_Structures;
 using SchoolAPI.Services;
+using SchoolAPI.Services.Enrollments;
 using SchoolAPI.Services.People;
 using SchoolAPI.Services.Registrations;
 using SchoolAPI.Services.School_Structures;
@@ -58,6 +60,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<IClassService, ClassService>();
             builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
             builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -133,7 +137,7 @@ namespace SchoolAPI
             app.UseMiddleware<ErrorHandlingMiddleware>();
             #endregion
 
-            #region seeding roles, users, students, and school levels
+            #region seeding roles, users, students, registrations, and school levels
             // ---- Seed roles & users here ----
             bool.TryParse(builder.Configuration["IsDataSeeded"], out bool isDataSeeded);
             if (isDataSeeded)
@@ -142,6 +146,7 @@ namespace SchoolAPI
                 await SchoolSeeder.SeedAsync(scope.ServiceProvider);
                 await IdentitySeeder.SeedAsync(scope.ServiceProvider);
                 await StudentSeeder.SeedAsync(scope.ServiceProvider);
+                await RegistrationSeeder.SeedAsync(scope.ServiceProvider);
             }
             #endregion
 

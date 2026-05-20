@@ -196,6 +196,51 @@ namespace SchoolAPI.Migrations
                     b.ToTable("TeacherSubjectClasses", (string)null);
                 });
 
+            modelBuilder.Entity("SchoolAPI.Models.Enrollment.Enrollment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("ClassId")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DropReason")
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DroppedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EnrolledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RegistrationId")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("StudentId")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("RegistrationId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Enrollments", (string)null);
+                });
+
             modelBuilder.Entity("SchoolAPI.Models.PaymentsWaitlists.Payment", b =>
                 {
                     b.Property<string>("Id")
@@ -320,7 +365,6 @@ namespace SchoolAPI.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ClassId")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("Code")
@@ -352,7 +396,6 @@ namespace SchoolAPI.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("LevelId")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<string>("MotherName")
@@ -504,6 +547,12 @@ namespace SchoolAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("EnrolledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EnrolledBy")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(100)");
 
@@ -517,9 +566,6 @@ namespace SchoolAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("RejectedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RejectedUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RejectionReason")
@@ -537,9 +583,11 @@ namespace SchoolAPI.Migrations
 
                     b.HasIndex("ClassId");
 
+                    b.HasIndex("EnrolledBy");
+
                     b.HasIndex("ProcessedBy");
 
-                    b.HasIndex("RejectedUserId");
+                    b.HasIndex("RejectedBy");
 
                     b.HasIndex("StudentId");
 
@@ -723,6 +771,33 @@ namespace SchoolAPI.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("SchoolAPI.Models.Enrollment.Enrollment", b =>
+                {
+                    b.HasOne("SchoolAPI.Models.School_Structure.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SchoolAPI.Models.Registrations.Registration", "Registration")
+                        .WithMany()
+                        .HasForeignKey("RegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SchoolAPI.Models.People.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Registration");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("SchoolAPI.Models.PaymentsWaitlists.Payment", b =>
                 {
                     b.HasOne("SchoolAPI.Models.People.User", "ReceivedUser")
@@ -770,27 +845,19 @@ namespace SchoolAPI.Migrations
 
             modelBuilder.Entity("SchoolAPI.Models.People.Student", b =>
                 {
-                    b.HasOne("SchoolAPI.Models.School_Structure.Class", "Class")
+                    b.HasOne("SchoolAPI.Models.School_Structure.Class", null)
                         .WithMany("Students")
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClassId");
 
-                    b.HasOne("SchoolAPI.Models.School_Structure.Level", "Level")
+                    b.HasOne("SchoolAPI.Models.School_Structure.Level", null)
                         .WithMany("Students")
-                        .HasForeignKey("LevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LevelId");
 
                     b.HasOne("SchoolAPI.Models.People.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("SchoolAPI.Models.People.Student", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Level");
 
                     b.Navigation("User");
                 });
@@ -814,6 +881,11 @@ namespace SchoolAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SchoolAPI.Models.People.User", "EnrolledUser")
+                        .WithMany()
+                        .HasForeignKey("EnrolledBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SchoolAPI.Models.People.User", "ProcessedUser")
                         .WithMany("ProcessedRegistrations")
                         .HasForeignKey("ProcessedBy")
@@ -821,7 +893,8 @@ namespace SchoolAPI.Migrations
 
                     b.HasOne("SchoolAPI.Models.People.User", "RejectedUser")
                         .WithMany()
-                        .HasForeignKey("RejectedUserId");
+                        .HasForeignKey("RejectedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SchoolAPI.Models.People.Student", "Student")
                         .WithMany("Registrations")
@@ -830,6 +903,8 @@ namespace SchoolAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Class");
+
+                    b.Navigation("EnrolledUser");
 
                     b.Navigation("ProcessedUser");
 

@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.Enrollment;
 using SchoolAPI.Models.PaymentsWaitlists;
 using SchoolAPI.Models.People;
 using SchoolAPI.Models.Registrations;
@@ -35,6 +36,9 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
 
     // Schedules
     public DbSet<Schedule> Schedules { get; set; }
+
+    //Enrollments
+    public DbSet<Enrollment> Enrollments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -89,12 +93,6 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.HasOne(c => c.Level)
                         .WithMany(l => l.Classes)
                         .HasForeignKey(c => c.LevelId)
-                        .OnDelete(DeleteBehavior.Restrict);
-
-            // Class → Students (One-to-Many)
-            buildAction.HasMany(c => c.Students)
-                        .WithOne(s => s.Class)
-                        .HasForeignKey(s => s.ClassId)
                         .OnDelete(DeleteBehavior.Restrict);
 
             // Class → ClassSubject (One-to-Many)
@@ -173,16 +171,6 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(s => s.Address).HasColumnType("nvarchar(100)").IsRequired();
             buildAction.Property(s => s.BackgroundStudy).HasColumnType("nvarchar(100)").IsRequired();
             buildAction.HasIndex(s => s.Code).IsUnique().HasFilter("code <> ''");
-
-            buildAction.HasOne(s => s.Level)
-                   .WithMany(l => l.Students)
-                   .HasForeignKey(s => s.LevelId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
-            buildAction.HasOne(s => s.Class)
-                   .WithMany(c => c.Students)
-                   .HasForeignKey(s => s.ClassId)
-                   .OnDelete(DeleteBehavior.Cascade);
 
             buildAction.HasMany(s => s.Registrations)
                         .WithOne(r => r.Student)
@@ -338,6 +326,7 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(r => r.StudentId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(r => r.ClassId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(r => r.Status).HasConversion<string>().IsRequired();
+            buildAction.Property(r => r.EnrolledBy).IsRequired(false);
             buildAction.Property(r => r.ProcessedBy).IsRequired(false);
             buildAction.Property(r => r.RejectedBy).IsRequired(false);
             buildAction.Property(r => r.Notes).HasColumnType("nvarchar(100)");
@@ -357,11 +346,10 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
                        .HasForeignKey(r => r.ClassId)
                        .OnDelete(DeleteBehavior.Restrict);
 
-            // Registration → RegistrationStatus (Many-to-One)
-            //buildAction.HasOne(r => r.Status)
-            //           .WithMany(s => s.Registrations)
-            //           .HasForeignKey(r => r.StatusId)
-            //           .OnDelete(DeleteBehavior.Restrict);
+            buildAction.HasOne(r => r.EnrolledUser)
+                       .WithMany()
+                       .HasForeignKey(r => r.EnrolledBy)
+                       .OnDelete(DeleteBehavior.Restrict);
 
             // Registration → User (ProcessedBy) (Many-to-One)
             buildAction.HasOne(r => r.ProcessedUser)
@@ -369,11 +357,10 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
                        .HasForeignKey(r => r.ProcessedBy)
                        .OnDelete(DeleteBehavior.Restrict);
 
-            // Registration → User (RejectedBy) (Many-to-One)
-            //buildAction.HasOne(r => r.RejectedUser)
-            //           .WithMany(u => u.RejectedRegistrations)
-            //           .HasForeignKey(r => r.RejectedBy)
-            //           .OnDelete(DeleteBehavior.Restrict);
+            buildAction.HasOne(r => r.RejectedUser)
+                    .WithMany()
+                    .HasForeignKey(r => r.RejectedBy)
+                    .OnDelete(DeleteBehavior.Restrict);
 
             buildAction.ToTable("Registrations");
         });
@@ -485,6 +472,29 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
                     "[StartTime] < [EndTime]"
                 );
             });
+        });
+        #endregion
+        #region Enrollments
+        modelBuilder.Entity<Enrollment>(buildAction =>
+        {
+            buildAction.HasKey(s => s.Id);
+
+            buildAction.Property(s => s.Id).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property( s => s.RegistrationId).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property(s => s.StudentId).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property(s => s.ClassId).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property(s => s.Status).HasConversion<string>().HasMaxLength(20).IsRequired();
+            buildAction.Property(s => s.EnrolledAt).HasColumnType("datetime2").IsRequired();
+            buildAction.Property(s => s.CompletedAt).HasColumnType("datetime2").IsRequired(false);
+            buildAction.Property(s => s.DroppedAt).HasColumnType("datetime2").IsRequired(false);
+            buildAction.Property(s => s.DropReason).HasColumnType("nvarchar(255)").IsRequired(false);
+
+            buildAction.HasOne(e => e.Registration)
+                       .WithMany()
+                       .HasForeignKey(e => e.RegistrationId)
+                       .OnDelete(DeleteBehavior.Restrict);
+
+            buildAction.ToTable("Enrollments");
         });
         #endregion
     }

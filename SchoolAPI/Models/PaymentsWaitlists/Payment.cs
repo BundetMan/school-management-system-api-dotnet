@@ -23,7 +23,7 @@ namespace SchoolAPI.Models.PaymentsWaitlists
         [MaxLength(20)]
         public string Status { get; set; } = "Pending";
 
-        public DateTime? PaidAt { get; set; } = DateTime.UtcNow;
+        public DateTime? PaidAt { get; set; }
 
         [Required]
         public string StudentId { get; set; } = default!;

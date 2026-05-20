@@ -8,8 +8,6 @@ namespace SchoolAPI.DTOs.People
         string FullName,
         string LatinName,
         GenderType Gender,
-        StudentStatus Status,
-        string LevelName,
-        string ClassName
+        StudentStatus Status
     );
 }

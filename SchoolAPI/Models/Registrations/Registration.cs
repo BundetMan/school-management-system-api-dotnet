@@ -1,7 +1,5 @@
 ﻿using SchoolAPI.Models.People;
 using SchoolAPI.Models.School_Structure;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolAPI.Models.Registrations
 {
@@ -10,12 +8,16 @@ namespace SchoolAPI.Models.Registrations
         public string Id { get; set; } = default!;
 
         public string StudentId { get; set; } = default!;
-        public Student Student { get; set; } = default!;
+        public Student? Student { get; set; }
 
         public string ClassId { get; set; } = default!;
-        public Class Class { get; set; } = default!;
+        public Class? Class { get; set; }
 
-        public RegistrationStatus Status { get; set; } = default!;
+        public RegistrationStatus Status { get; set; }
+
+        public string? EnrolledBy { get; set; }
+        public User? EnrolledUser { get; set; }
+        public DateTime EnrolledAt { get; set; }
 
         //approve
         public string? ProcessedBy { get; set; }
@@ -30,7 +32,7 @@ namespace SchoolAPI.Models.Registrations
 
         public string? Notes { get; set; } = null;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
     }
 
 }

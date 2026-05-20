@@ -7,7 +7,7 @@ using SchoolAPI.Services.Registrations;
 
 namespace SchoolAPI.Controllers
 {
-    [Authorize(Policy = "RequireAdminRole")]
+    //[Authorize(Policy = "RequireAdminRole")]
     [Route("api/[controller]")]
     [ApiController]
     public class RegistrationController : ControllerBase
@@ -70,6 +70,13 @@ namespace SchoolAPI.Controllers
         public async Task<IActionResult> Create([FromBody] RegistrationCreateDto createDto)
         {
             var created = await _service.CreateAsync(createDto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+
+        [HttpPost("enrollment")]
+        public async Task<IActionResult> CreateWithEnrollment(RegistrationManualCreateDto dto)
+        {
+            var created = await _service.CreateWithEnrollmentAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 

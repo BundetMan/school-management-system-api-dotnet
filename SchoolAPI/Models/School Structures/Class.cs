@@ -13,10 +13,6 @@ namespace SchoolAPI.Models.School_Structure
         public string Name { get; set; } = default!;
 
         public int Capacity { get; set; }
-
-        //[NotMapped] // Not stored in the database
-        //public int AvailableSeats => Capacity - Students.Count(s => s.Status == StudentStatus.Active);
-
         public ClassStatus Status { get; set; } = ClassStatus.Active;
 
         public string LevelId { get; set; } = default!;
@@ -28,10 +24,11 @@ namespace SchoolAPI.Models.School_Structure
         public ICollection<Schedule> Schedules { get; set; } = default!;
         public ICollection<Registration> Registrations { get; set; } = default!;
         public ICollection<Waitlist> Waitlists { get; set; } = default!;
-    }
-    public enum ClassStatus
-    {
-        Active,
-        Inactive,
+
+        public int EnrolledCount => Registrations?
+            .Count(r => r.Status == RegistrationStatus.Approved) ?? 0;
+
+        public int AvailableSeats => Capacity - EnrolledCount;
+        public bool IsFull => AvailableSeats <= 0;
     }
 }

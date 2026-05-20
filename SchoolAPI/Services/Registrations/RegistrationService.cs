@@ -2,49 +2,61 @@
 using SchoolAPI.DTOs.Registration;
 using SchoolAPI.Models.Registrations;
 using SchoolAPI.Repositories.Registrations;
-using SchoolAPI.Services.Registrations;
+using SchoolAPI.Services.Enrollments;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolAPI.Services.Registrations;
 
 public class RegistrationService : IRegistrationService
 {
     private readonly IRegistrationRepository _repository;
-    public RegistrationService(IRegistrationRepository repository)
+    private readonly IEnrollmentService _enrollmentService;
+    public RegistrationService(
+        IRegistrationRepository repository,
+        IEnrollmentService enrollmentService)
     {
         _repository = repository;
+        _enrollmentService = enrollmentService;
     }
 
     public async Task<RegistrationDto?> GetByIdAsync(string id)
     {
-        var registration = await _repository.GetByIdAsync(id);
-        return registration?.Adapt<RegistrationDto>();
+        return await _repository.GetQueryableDetails()
+            .Where(r => r.Id == id)
+            .ProjectToType<RegistrationDto>()
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<RegistrationDto>> GetAllAsync()
-    {
-        var registrations = await _repository.GetAllAsync();
-        return registrations.Adapt<IEnumerable<RegistrationDto>>();
-    }
+    
+        => await _repository.GetQueryableDetails().ProjectToType<RegistrationDto>().ToListAsync();
+
 
     public async Task<IEnumerable<RegistrationDto>> GetByStudentIdAsync(string studentId)
     {
-        var registrations = await _repository.GetByStudentIdAsync(studentId);
-        return registrations.Adapt<IEnumerable<RegistrationDto>>();
+        return await _repository.GetQueryableDetails()
+            .Where(r => r.StudentId == studentId)
+            .ProjectToType<RegistrationDto>()
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<RegistrationDto>> GetByClassIdAsync(string classId)
     {
-        var registrations = await _repository.GetByClassIdAsync(classId);
-        return registrations.Adapt<IEnumerable<RegistrationDto>>();
+        return await _repository.GetQueryableDetails()
+            .Where(r => r.ClassId == classId)
+            .ProjectToType<RegistrationDto>()
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<RegistrationDto>> GetByStatusAsync(RegistrationStatus status)
     {
-        var registrations = await _repository.GetByStatusAsync(status);
-        return registrations.Adapt<IEnumerable<RegistrationDto>>();
+        return await _repository.GetQueryableDetails()
+            .Where(r => r.Status == status)
+            .ProjectToType<RegistrationDto>()
+            .ToListAsync();
     }
 
-    public async Task<RegistrationCreatedDto> CreateAsync(RegistrationCreateDto createDto)
+    public async Task<RegistrationDto> CreateAsync(RegistrationCreateDto createDto)
     {
         var alreadyExists = await _repository.ExistsAsync(createDto.StudentId, createDto.ClassId);
         if (alreadyExists)
@@ -62,8 +74,40 @@ public class RegistrationService : IRegistrationService
             CreatedAt = DateTime.UtcNow
         };
 
-        var created = await _repository.CreateAsync(registration);
-        return created.Adapt<RegistrationCreatedDto>();
+        await _repository.CreateAsync(registration);
+        return registration.Adapt<RegistrationDto>();
+    }
+
+    public async Task<ManualRegistrationEnrollmentDto> CreateWithEnrollmentAsync(RegistrationManualCreateDto dto)
+    {
+        var alreadyExists = await _repository.ExistsAsync(dto.StudentId, dto.ClassId);
+        if (alreadyExists)
+        {
+            throw new InvalidOperationException("Student is already registered for this class.");
+        }
+
+        var registration = new Registration
+        {
+            Id = Guid.NewGuid().ToString(),
+            StudentId = dto.StudentId,
+            ClassId = dto.ClassId,
+            Status = dto.InitialStatus,
+            Notes = dto.Notes,
+            EnrolledBy = dto.EnrolledByUserId,
+            EnrolledAt = DateTime.UtcNow,
+
+            // staff can approve in one step
+            ProcessedBy = dto.EnrolledByUserId,
+            ProcessedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _repository.CreateAsync(registration);
+
+        if (registration.Status == RegistrationStatus.Approved)
+            await _enrollmentService.CreateFromRegistrationAsync(registration.Id);
+
+        return registration.Adapt<ManualRegistrationEnrollmentDto>();
     }
 
     public async Task<RegistrationDto> ApproveAsync(string id, RegistrationApproveDto dto)
@@ -78,9 +122,13 @@ public class RegistrationService : IRegistrationService
         registration.Status = RegistrationStatus.Approved;
         registration.ProcessedBy = dto.ProcessedBy;
         registration.ProcessedAt = DateTime.UtcNow;
+        registration.EnrolledBy = dto.ProcessedBy;
 
-        var updated = await _repository.UpdateAsync(registration);
-        return updated.Adapt<RegistrationDto>();
+        await _repository.UpdateAsync(registration);
+
+        // Automatically create an enrollment when a registration is approved
+        await _enrollmentService.CreateFromRegistrationAsync(registration.Id);
+        return registration.Adapt<RegistrationDto>();
     }
 
     public async Task<RegistrationDto> RejectAsync(string id, RegistrationRejectDto dto)
@@ -97,13 +145,13 @@ public class RegistrationService : IRegistrationService
         registration.RejectionReason = dto.RejectionReason;
         registration.RejectedAt = DateTime.UtcNow;
 
-        var updated = await _repository.UpdateAsync(registration);
-        return updated.Adapt<RegistrationDto>();
+        await _repository.UpdateAsync(registration);
+        return registration.Adapt<RegistrationDto>();
     }
      public async Task<bool> DeleteAsync(string id)
     {
         var existing = await _repository.GetByIdAsync(id);
-        if (existing == null)
+        if(existing == null)
             throw new KeyNotFoundException($"Registration with ID '{id}' not found.");
 
         if(existing.Status == RegistrationStatus.Approved)

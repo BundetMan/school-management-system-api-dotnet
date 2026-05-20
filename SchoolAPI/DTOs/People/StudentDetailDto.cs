@@ -19,13 +19,11 @@ namespace SchoolAPI.DTOs.People
         string MotherName,
         string Contact,
         string Address,
-        string LevelName,
-        string ClassName,
         IEnumerable<PaymentSummaryDto> Payments,
         IEnumerable<RegistrationSummaryDto> Registrations,
         IEnumerable<WaitlistSummaryDto> Waitlists
     );
-    public record PaymentSummaryDto(string Id, decimal Amount, DateTime Date, string Status);
-    public record RegistrationSummaryDto(string Id, string ClassName, DateTime RegisteredAt);
-    public record WaitlistSummaryDto(string Id, string ClassName,DateTime AddedAt);
+    public record PaymentSummaryDto(string Id, decimal Amount, DateTime? PaidAt, string Status);
+    public record RegistrationSummaryDto(string Id, string ClassName, string Status, DateTime? CreatedAt);
+    public record WaitlistSummaryDto(string Id, string ClassName, DateTime? RequestedAt);
 }
