@@ -5,13 +5,11 @@ namespace SchoolAPI.DTOs.Registration;
 public record ManualRegistrationEnrollmentDto(
     string Id,
     string StudentId,
-    string StudentName,
     string ClassId,
-    string ClassName,
     RegistrationStatus Status,
     string? Notes,
-    string? ProcessedBy,
+    string? ProcessedByUserId,
     DateTime? ProcessedAt,
-    string EnrollmentByUserId,
+    string EnrolledByUserId,
     DateTime CreatedAt
 );

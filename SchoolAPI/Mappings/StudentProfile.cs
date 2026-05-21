@@ -11,6 +11,7 @@ public class StudentProfile : IRegister
     public void Register(TypeAdapterConfig config)
     {
         config.NewConfig<Student, StudentDto>()
+            .Map(desc => desc.Id, src => src.Id)
             .Map(dest => dest.Code, src => src.Code)
             .Map(dest => dest.Gender, src => src.Gender)
             .Map(dest => dest.Status, src => src.Status);

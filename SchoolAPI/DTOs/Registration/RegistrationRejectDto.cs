@@ -1,6 +1,9 @@
-﻿namespace SchoolAPI.DTOs.Registration;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SchoolAPI.DTOs.Registration;
 
 public record RegistrationRejectDto(
-    string RejectedBy,
-    string RejectionReason
+
+    [Required] string RejectedBy,
+    [Required] string RejectionReason
 );

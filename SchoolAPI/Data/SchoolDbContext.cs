@@ -425,6 +425,8 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(w => w.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(w => w.StudentId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(w => w.ClassId).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property(w => w.Status).HasConversion<string>().HasMaxLength(20).IsRequired();
+            buildAction.Property(w => w.Position).IsRequired();
             buildAction.Property(w => w.Notes).HasColumnType("nvarchar(255)").IsRequired(false);
             buildAction.Property(w => w.RequestedAt).HasColumnType("datetime2").IsRequired();
             // Waitlist → Student (Many-to-One)

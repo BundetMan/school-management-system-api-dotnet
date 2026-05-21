@@ -1,11 +1,14 @@
 ﻿using SchoolAPI.Models;
 using SchoolAPI.Models.People;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolAPI.DTOs.People
 {
     public class StudentUpdateDetailDto
     {
+        [Required]
         public string FullName { get; set; } = null!;
+        [Required]
         public string LatinName { get; set; } = null!;
         public GenderType Gender { get; set; }
         public StudentStatus Status { get; set; }

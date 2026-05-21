@@ -52,6 +52,11 @@ namespace SchoolAPI.Mappings
                 .Map(dest => dest.Status, _ => RegistrationStatus.Rejected)
                 .Map(dest => dest.RejectedAt, _ => DateTime.UtcNow)
                 .IgnoreNonMapped(true);
+
+            // source -> destination
+            config.NewConfig<Registration, ManualRegistrationEnrollmentDto>()
+                .Map(dest => dest.ProcessedByUserId, src => src.ProcessedBy)
+                .Map(dest => dest.EnrolledByUserId, src => src.EnrolledBy);
         }
     }
 }

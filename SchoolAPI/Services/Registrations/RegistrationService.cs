@@ -4,6 +4,7 @@ using SchoolAPI.Models.Registrations;
 using SchoolAPI.Repositories.Registrations;
 using SchoolAPI.Services.Enrollments;
 using Microsoft.EntityFrameworkCore;
+using SchoolAPI.Services.School_Structures;
 
 namespace SchoolAPI.Services.Registrations;
 
@@ -11,12 +12,15 @@ public class RegistrationService : IRegistrationService
 {
     private readonly IRegistrationRepository _repository;
     private readonly IEnrollmentService _enrollmentService;
+    private readonly IClassService _classService;
     public RegistrationService(
         IRegistrationRepository repository,
-        IEnrollmentService enrollmentService)
+        IEnrollmentService enrollmentService,
+        IClassService classService)
     {
         _repository = repository;
         _enrollmentService = enrollmentService;
+        _classService = classService;
     }
 
     public async Task<RegistrationDto?> GetByIdAsync(string id)
@@ -86,12 +90,24 @@ public class RegistrationService : IRegistrationService
             throw new InvalidOperationException("Student is already registered for this class.");
         }
 
+        //check class capacity before creating registration
+        var targetClass = await _classService.GetClassByIdAsync(dto.ClassId) 
+            ?? throw new KeyNotFoundException($"Class with ID '{dto.ClassId}' not found.");
+
+        if (targetClass.AvailableSeats < 1)
+            throw new InvalidOperationException("Class is already at full capacity.");
+
+        if(dto.InitialStatus == RegistrationStatus.Pending)
+        {
+            throw new InvalidOperationException("Manual enrollment must have an initial status of Approved.");
+        }
+
         var registration = new Registration
         {
             Id = Guid.NewGuid().ToString(),
             StudentId = dto.StudentId,
             ClassId = dto.ClassId,
-            Status = dto.InitialStatus,
+            Status = RegistrationStatus.Approved,
             Notes = dto.Notes,
             EnrolledBy = dto.EnrolledByUserId,
             EnrolledAt = DateTime.UtcNow,
@@ -104,8 +120,7 @@ public class RegistrationService : IRegistrationService
 
         await _repository.CreateAsync(registration);
 
-        if (registration.Status == RegistrationStatus.Approved)
-            await _enrollmentService.CreateFromRegistrationAsync(registration.Id);
+        await _enrollmentService.CreateFromRegistrationAsync(registration.Id);
 
         return registration.Adapt<ManualRegistrationEnrollmentDto>();
     }

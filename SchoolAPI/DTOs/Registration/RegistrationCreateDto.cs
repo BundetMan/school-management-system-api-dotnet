@@ -1,8 +1,10 @@
-﻿namespace SchoolAPI.DTOs.Registration;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SchoolAPI.DTOs.Registration;
 
 public record RegistrationCreateDto
 (
-    string StudentId,
-    string ClassId,
+    [Required] string StudentId,
+    [Required] string ClassId,
     string? Notes
 );

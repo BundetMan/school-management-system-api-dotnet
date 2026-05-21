@@ -134,7 +134,7 @@ namespace SchoolAPI
             var app = builder.Build();
 
             #region Global error handling middleware
-            app.UseMiddleware<ErrorHandlingMiddleware>();
+            //app.UseMiddleware<ErrorHandlingMiddleware>();
             #endregion
 
             #region seeding roles, users, students, registrations, and school levels
