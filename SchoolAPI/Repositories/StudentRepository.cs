@@ -21,6 +21,10 @@ namespace SchoolAPI.Repositories
                 .Include(s => s.Registrations).ThenInclude(r => r.Class)
                 .Include(s => s.Waitlists).ThenInclude(w => w.Class);
         }
+
+        public async Task<Student?> GetByIdAsync(string id)
+            => await GetQueryable().FirstOrDefaultAsync(s => s.Id == id);
+
         public async Task<Student?> GetByCodeAsync(string code)
             => await GetQueryable().FirstOrDefaultAsync(s => s.Code == code);
 

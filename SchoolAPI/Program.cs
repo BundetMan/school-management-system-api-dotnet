@@ -11,13 +11,16 @@ using SchoolAPI.Repositories;
 using SchoolAPI.Repositories.Enrollments;
 using SchoolAPI.Repositories.Registrations;
 using SchoolAPI.Repositories.School_Structures;
+using SchoolAPI.Repositories.Waitlists;
 using SchoolAPI.Services;
 using SchoolAPI.Services.Enrollments;
 using SchoolAPI.Services.People;
 using SchoolAPI.Services.Registrations;
 using SchoolAPI.Services.School_Structures;
+using SchoolAPI.Services.Waitlists;
 using System.Reflection;
 using System.Text.Json.Serialization;
+
 
 namespace SchoolAPI
 {
@@ -62,6 +65,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<IRegistrationService, RegistrationService>();
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+            builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
+            builder.Services.AddScoped<IWaitlistService, WaitlistService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -134,7 +139,7 @@ namespace SchoolAPI
             var app = builder.Build();
 
             #region Global error handling middleware
-            //app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             #endregion
 
             #region seeding roles, users, students, registrations, and school levels

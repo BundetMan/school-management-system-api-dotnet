@@ -15,5 +15,8 @@ namespace SchoolAPI.Services.Registrations
         Task<RegistrationDto> ApproveAsync(string id, RegistrationApproveDto dto);
         Task<RegistrationDto> RejectAsync(string id, RegistrationRejectDto dto);
         Task<bool> DeleteAsync(string id);
+
+        // Additional methods for handling waitlist promotions
+        Task PromoteFromWaitlistAsync(string waitlistId, string promotedByUserId);
     }
 }

@@ -25,7 +25,15 @@ public class StudentsController : ControllerBase
         var students = await _studentService.GetAllAsync(page, pageSize);
         return Ok(students);
     }
-    [HttpGet("{code}")]
+    [HttpGet("by-id/{id}")]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var student = await _studentService.GetByIdAsync(id);
+        if (student == null) return NotFound($"Student with ID '{id}' not found.");
+        return Ok(student);
+    }
+
+    [HttpGet("by-code/{code}")]
     public async Task<IActionResult> GetByCode(string code)
     {
         var student = await _studentService.GetCodeAsync(code);

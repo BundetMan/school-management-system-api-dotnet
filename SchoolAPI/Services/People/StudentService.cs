@@ -28,6 +28,50 @@ namespace SchoolAPI.Services.People
             _dbContext = dbContext;
         }
 
+
+        public async Task<StudentDetailDto?> GetByIdAsync(string id)
+        {
+            return await _dbContext.Students
+                    .Where(s => s.Id.ToString() == id)
+                    .Select(s => new StudentDetailDto
+                    (
+                        s.Id.ToString(),
+                        s.Code,
+                        s.FullName,
+                        s.LatinName,
+                        s.Gender,
+                        s.Status,
+                        s.DateOfBirth,
+                        s.PlaceOfBirth,
+                        s.BackgroundStudy,
+                        s.FatherName,
+                        s.MotherName,
+                        s.Contact,
+                        s.Address,
+
+                        s.Payments.Select(p => new PaymentSummaryDto(
+                            p.Id.ToString(),
+                            p.Amount,
+                            p.PaidAt,
+                            p.Status.ToString()
+                        )),
+
+                        s.Registrations.Select(r => new RegistrationSummaryDto(
+                            r.Id.ToString(),
+                            r.Class.Name,
+                            r.Status.ToString(),
+                            r.CreatedAt
+                        )),
+                        s.Waitlists.Select(w => new WaitlistSummaryDto(
+                            w.Id.ToString(),
+                            w.Class.Name,
+                            w.RequestedAt
+                        ))
+                    ))
+                    .AsSplitQuery()
+                    .FirstOrDefaultAsync();
+        }
+
         public async Task<StudentDetailDto?> GetCodeAsync(string code)
         {
             return await _dbContext.Students
@@ -66,8 +110,9 @@ namespace SchoolAPI.Services.People
                             w.RequestedAt
                         ))
                     ))
+                    .AsSplitQuery()
                     .FirstOrDefaultAsync();
-                    }
+        }
 
         public async Task<PagedResult<StudentDto>> GetAllAsync(int page = 1, int pageSize = 30)
         {
@@ -134,6 +179,7 @@ namespace SchoolAPI.Services.People
                         .Select(r => r.Status.ToString())
                         .FirstOrDefault()
                 ))
+                .AsSplitQuery()
                 .ToListAsync();
 
             return new PagedResult<StudentSummaryDto>(

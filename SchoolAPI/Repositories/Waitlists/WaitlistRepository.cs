@@ -17,19 +17,33 @@ namespace SchoolAPI.Repositories.Waitlists
             return await _context.Waitlists
                 .Include(w => w.Student)
                 .Include(w => w.Class)
+                .OrderBy(w => w.ClassId)
+                .ThenBy(w => w.Position) // order by class and then by position within the class
                 .ToListAsync();
         }
         public async Task<Waitlist?> GetByIdAsync(string id)
         {
-            return await _context.Waitlists.FindAsync(id);
+            return await _context.Waitlists
+                .Include (w => w.Student)
+                .Include(w => w.Class)
+                .FirstOrDefaultAsync(w => w.Id == id);
         }
         public async Task<IEnumerable<Waitlist>> GetByClassIdAsync(string classId)
         {
-            return await _context.Waitlists.Where(w => w.ClassId == classId).ToListAsync();
+            return await _context.Waitlists
+                .Include(w => w.Student)
+                .Include(w => w.Class)
+                .Where(w => w.ClassId == classId)
+                .OrderBy(w => w.Position) // waitlist should be ordered by position
+                .ToListAsync();
         }
         public async Task<IEnumerable<Waitlist>> GetByStudentIdAsync(string studentId)
         {
-            return await _context.Waitlists.Where(w => w.StudentId == studentId).ToListAsync();
+            return await _context.Waitlists
+                .Include(w => w.Student)
+                .Include(w => w.Class)
+                .Where(w => w.StudentId == studentId)
+                .ToListAsync();
         }
         public async Task<int> GetNextPositionAsync(string classId)
         {
@@ -43,10 +57,12 @@ namespace SchoolAPI.Repositories.Waitlists
             var waitlistsToUpdate = await _context.Waitlists
                 .Where(w => w.ClassId == classId && w.Position > afterPosition)
                 .ToListAsync();
+
             foreach (var waitlist in waitlistsToUpdate)
             {
                 waitlist.Position -= 1;
             }
+
             await _context.SaveChangesAsync();
         }
 

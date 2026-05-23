@@ -19,7 +19,7 @@ namespace SchoolAPI.Repositories.School_Structures
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
 
-        public async Task<Level> AddAsync(Level level)
+        public async Task<Level?> AddAsync(Level level)
         {
             await _context.Levels.AddAsync(level);
             await _context.SaveChangesAsync();

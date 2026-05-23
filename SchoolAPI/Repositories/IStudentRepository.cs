@@ -9,6 +9,7 @@ namespace SchoolAPI.Repositories
     public interface IStudentRepository
     {
         Task<Student?> GetByCodeAsync(string code);
+        Task<Student?> GetByIdAsync(string id);
         Task<IEnumerable<Student>> GetAllAsync();
         Task<Student?> SearchAsync(Expression<Func<Student, bool>> predicate);
         IQueryable<Student> GetQueryable();
