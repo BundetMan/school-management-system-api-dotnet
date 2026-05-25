@@ -1,20 +1,17 @@
 ﻿using SchoolAPI.Models.Schedules;
-using System.ComponentModel.DataAnnotations;
 
 namespace SchoolAPI.Models.Curriculum_Bridges
 {
     public class Subject
     {
-        public string Id { get; set; } = default!;
+        public string Id { get; set; } = String.Empty;
 
-        [Required, MaxLength(100)]
-        public string Name { get; set; } = default!;
+        public string Name { get; set; } = String.Empty;
 
-        [Required, MaxLength(50)]
-        public string Code { get; set; } = default!;
+        public string Code { get; set; } = String.Empty;
 
-        public ICollection<ClassSubject> ClassSubjects { get; set; } = default!;
-        public ICollection<TeacherSubjectClass> TeacherSubjectClasses { get; set; } = default!;
-        public ICollection<Schedule> Schedules { get; set; } = default!;
+        public ICollection<ClassSubject> ClassSubjects { get; set; } = [];
+        public ICollection<TeacherSubjectClass> TeacherSubjectClasses { get; set; } = [];
+        public ICollection<Schedule> Schedules { get; set; } = [];
     }
 }

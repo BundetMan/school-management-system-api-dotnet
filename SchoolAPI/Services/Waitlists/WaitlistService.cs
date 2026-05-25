@@ -78,7 +78,8 @@ public class WaitlistService : IWaitlistService
             StudentId = dto.StudentId,
             ClassId = dto.ClassId,
             Position = position,
-            RequestedAt = DateTime.UtcNow
+            RequestedAt = DateTime.UtcNow,
+            Notes = dto.Notes,
         };
         await _waitlistRepo.AddAsync(waitlist);
         return waitlist.Adapt<WaitlistDto>();

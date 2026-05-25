@@ -33,6 +33,7 @@ public class RegistrationService : IRegistrationService
         return await _repository.GetQueryableDetails()
             .Where(r => r.Id == id)
             .ProjectToType<RegistrationDto>()
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
     }
 
@@ -40,12 +41,12 @@ public class RegistrationService : IRegistrationService
     
         => await _repository.GetQueryableDetails().ProjectToType<RegistrationDto>().ToListAsync();
 
-
     public async Task<IEnumerable<RegistrationDto>> GetByStudentIdAsync(string studentId)
     {
         return await _repository.GetQueryableDetails()
             .Where(r => r.StudentId == studentId)
             .ProjectToType<RegistrationDto>()
+            .AsSplitQuery()
             .ToListAsync();
     }
 
@@ -54,6 +55,7 @@ public class RegistrationService : IRegistrationService
         return await _repository.GetQueryableDetails()
             .Where(r => r.ClassId == classId)
             .ProjectToType<RegistrationDto>()
+            .AsSplitQuery()
             .ToListAsync();
     }
 
@@ -62,6 +64,7 @@ public class RegistrationService : IRegistrationService
         return await _repository.GetQueryableDetails()
             .Where(r => r.Status == status)
             .ProjectToType<RegistrationDto>()
+            .AsSplitQuery()
             .ToListAsync();
     }
 
