@@ -131,6 +131,10 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(t => t.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(t => t.Name).HasColumnType("nvarchar(100)").IsRequired();
             buildAction.Property(t => t.Specialization).HasColumnType("nvarchar(50)");
+            buildAction.Property(t => t.Phone).HasColumnType("varchar(20)");
+            buildAction.Property(t => t.Gender).HasColumnType("varchar(10)");
+            buildAction.Property(t => t.IsActive).HasDefaultValue(true);
+
             buildAction.Property(t => t.UserId).IsRequired();
 
             buildAction.HasIndex(t => t.Name).HasFilter("[Name] <> ''");

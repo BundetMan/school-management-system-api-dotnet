@@ -11,6 +11,7 @@ using SchoolAPI.Repositories;
 using SchoolAPI.Repositories.Enrollments;
 using SchoolAPI.Repositories.Registrations;
 using SchoolAPI.Repositories.School_Structures;
+using SchoolAPI.Repositories.Subjects;
 using SchoolAPI.Repositories.Waitlists;
 using SchoolAPI.Services;
 using SchoolAPI.Services.Enrollments;
@@ -18,6 +19,7 @@ using SchoolAPI.Services.People;
 using SchoolAPI.Services.Registrations;
 using SchoolAPI.Services.School_Structures;
 using SchoolAPI.Services.Waitlists;
+using SchoolAPI.Services.Subjects;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -67,6 +69,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<IWaitlistRepository, WaitlistRepository>();
             builder.Services.AddScoped<IWaitlistService, WaitlistService>();
+            builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+            builder.Services.AddScoped<ISubjectService, SubjectService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 

@@ -12,6 +12,10 @@ namespace SchoolAPI.Models.People
 
         public string Specialization { get; set; } = default!;
 
+        public string? Phone { get; set; }         // for notifications/contact
+        public string? Gender { get; set; }         // reporting
+        public bool IsActive { get; set; } = true;
+
         public string UserId { get; set; } = default!;
         public User User { get; set; } = default!;
 
