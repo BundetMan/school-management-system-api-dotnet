@@ -21,7 +21,7 @@ namespace SchoolAPI.Mappings
             config.NewConfig<Teacher, TeacherDto>();
             config.NewConfig<TeacherCreateDto, Teacher>()
                 .Map(dest => dest.Id, _ => Guid.NewGuid().ToString())
-                .Map(dest => dest.IsActive, _ => true);
+                .Map(dest => dest.Gender, src => src.Gender);
 
             config.NewConfig<TeacherUpdateDto, Teacher>()
                 .Ignore(dest => dest.Id)

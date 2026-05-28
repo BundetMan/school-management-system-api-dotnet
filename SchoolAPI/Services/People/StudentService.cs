@@ -199,7 +199,7 @@ namespace SchoolAPI.Services.People
                 UserName = dto.LatinName,
                 Email = dto.Email,
                 EmailConfirmed = true,
-                Status = "Pending"
+                Status = Status.Active
             };
 
             using var transaction = await _dbContext.Database.BeginTransactionAsync();

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using SchoolAPI.DTOs.People;
 using SchoolAPI.Models.People;
 
-[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 //[Authorize(Roles = "Admin")]
@@ -18,7 +17,6 @@ public class UsersController : ControllerBase
         _userManager = userManager;
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers(int page = 1, int pageSize = 20)
     {
@@ -47,8 +45,6 @@ public class UsersController : ControllerBase
         var roles = await _userManager.GetRolesAsync(user);
         return Ok(new UserDto { Id = user.Id, UserName = user.UserName!, Email = user.Email!, Roles = roles });
     }
-
-    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<UserDto>> CreateUser(UserCreateDto dto)
     {
@@ -78,7 +74,6 @@ public class UsersController : ControllerBase
         return Ok(new UserDto { Id = user.Id, UserName = user.UserName, Email = user.Email });
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {

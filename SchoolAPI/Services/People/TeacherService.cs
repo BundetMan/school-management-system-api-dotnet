@@ -1,4 +1,7 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SchoolAPI.Data;
 using SchoolAPI.DTOs;
 using SchoolAPI.DTOs.People;
 using SchoolAPI.Models.People;
@@ -9,9 +12,13 @@ namespace SchoolAPI.Services.People
     public class TeacherService : ITeacherService
     {
         private readonly ITeacherRepository _teacherRepo;
-        public TeacherService(ITeacherRepository teacherRepo)
+        private readonly SchoolDbContext _dbContext;
+        private readonly UserManager<User> _userManager;
+        public TeacherService(ITeacherRepository teacherRepo, SchoolDbContext dbContext, UserManager<User> userManager)
         {
             _teacherRepo = teacherRepo;
+            _dbContext = dbContext;
+            _userManager = userManager;
         }
         
         public async Task<IEnumerable<TeacherDto>> GetAllTeachersAsync()
@@ -60,9 +67,46 @@ namespace SchoolAPI.Services.People
 
         public async Task<TeacherDto> CreateTeacherAsync(TeacherCreateDto dto)
         {
-            var teacher = dto.Adapt<Teacher>();
-            await _teacherRepo.CreateAsync(teacher);
-            return teacher.Adapt<TeacherDto>();
+            const string role = "Teacher";
+            var user = new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = dto.Email,
+                Email = dto.Email,
+                EmailConfirmed = true,
+                Status = Status.Active
+            };
+
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var result = await _userManager.CreateAsync(user, dto.Password);
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description);
+                    throw new InvalidOperationException($"User creation failed: {string.Join(", ", errors)}");
+                }
+
+                var addRoleResult = await _userManager.AddToRoleAsync(user, role);
+                if (!addRoleResult.Succeeded)
+                {
+                    var errors = addRoleResult.Errors.Select(e => e.Description);
+                    throw new InvalidOperationException($"Failed to add role: {string.Join(", ", errors)}");
+                }
+
+                var teacher = dto.Adapt<Teacher>();
+                teacher.UserId = user.Id;
+                teacher.IsActive = true;
+                await _teacherRepo.CreateAsync(teacher);
+
+                await transaction.CommitAsync();
+                return teacher.Adapt<TeacherDto>();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;  // re-throw so the controller/caller still sees the error
+            }
         }
 
         public async Task<TeacherDto> UpdateTeacherAsync(string id, TeacherUpdateDto dto)
@@ -84,6 +128,21 @@ namespace SchoolAPI.Services.People
                 ?? throw new KeyNotFoundException($"Teacher with ID '{id}' was not found.");
 
             await _teacherRepo.DeleteAsync(teacher);
+        }
+
+        public async Task DeactivateTeacherAsync(string id)
+        {
+            var teacher = await _teacherRepo.GetTeacherByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Teacher with ID '{id}' was not found.");
+            teacher.IsActive = false;
+            await _teacherRepo.UpdateAsync(teacher);
+
+            var user = await _userManager.FindByIdAsync(teacher.UserId);
+            if(user is not null)
+            {
+                user.Status = Status.Inactive;
+                await _userManager.UpdateAsync(user);
+            }
         }
 
         public async Task<bool> TeacherExistsAsync(string id)

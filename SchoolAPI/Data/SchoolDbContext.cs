@@ -116,6 +116,7 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
 
         #endregion
         #region People 
+        modelBuilder.Entity<User>().Property(u => u.Status).HasConversion<string>();
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<Role>().ToTable("Roles");//default name is AspNetRoles
         modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles")
@@ -132,7 +133,7 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(t => t.Name).HasColumnType("nvarchar(100)").IsRequired();
             buildAction.Property(t => t.Specialization).HasColumnType("nvarchar(50)");
             buildAction.Property(t => t.Phone).HasColumnType("varchar(20)");
-            buildAction.Property(t => t.Gender).HasColumnType("varchar(10)");
+            buildAction.Property(t => t.Gender).HasConversion<string>().HasMaxLength(10);
             buildAction.Property(t => t.IsActive).HasDefaultValue(true);
 
             buildAction.Property(t => t.UserId).IsRequired();

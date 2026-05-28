@@ -1,11 +1,13 @@
-﻿namespace SchoolAPI.DTOs.People;
+﻿using SchoolAPI.Models;
+
+namespace SchoolAPI.DTOs.People;
 
 public record TeacherDto(
     string Id,
     string Name,
     string Specialization,
     string? Phone,
-    string? Gender,
+    GenderType? Gender,
     bool IsActive,
     string UserId
 );
@@ -14,17 +16,17 @@ public record TeacherDto(
 public record TeacherCreateDto(
     string Name,
     string Specialization,
-    string UserId,          // required — every teacher must link to a user account
+    string Email,
+    string Password,
     string? Phone,
-    string? Gender,
-    bool IsActive = true
+    GenderType? Gender
 );
 
 public record TeacherUpdateDto(
     string Name,
     string Specialization,
     string? Phone,
-    string? Gender,
+    GenderType? Gender,
     bool IsActive
 );
 
@@ -34,7 +36,7 @@ public record TeacherWithSchedulesDto(
     string Name,
     string Specialization,
     string? Phone,
-    string? Gender,
+    GenderType? Gender,
     bool IsActive,
     IEnumerable<ScheduleSummaryDto> Schedules
 );
@@ -45,7 +47,7 @@ public record TeacherWithAssignmentsDto(
     string Name,
     string Specialization,
     string? Phone,
-    string? Gender,
+    GenderType? Gender,
     bool IsActive,
     IEnumerable<SubjectClassAssignmentDto> Assignments
 );
@@ -66,16 +68,3 @@ public record SubjectClassAssignmentDto(
     string SubjectId,
     string SubjectName
 );
-
-// Generic pagination wrapper
-//public record PagedResultDto<T>(
-//    IReadOnlyList<T> Items,
-//    int TotalCount,
-//    int Page,
-//    int PageSize
-//)
-//{
-//    public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
-//    public bool HasNextPage => Page < TotalPages;
-//    public bool HasPreviousPage => Page > 1;
-//};

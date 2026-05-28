@@ -22,6 +22,7 @@ using SchoolAPI.Services.Waitlists;
 using SchoolAPI.Services.Subjects;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using SchoolAPI.Repositories.People;
 
 
 namespace SchoolAPI
@@ -71,6 +72,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<IWaitlistService, WaitlistService>();
             builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
             builder.Services.AddScoped<ISubjectService, SubjectService>();
+            builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+            builder.Services.AddScoped<ITeacherService, TeacherService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 

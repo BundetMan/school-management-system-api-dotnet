@@ -38,7 +38,7 @@ public class StudentSeeder
                 UserName = email,
                 Email = email,
                 EmailConfirmed = false,
-                Status = "Active"
+                Status = Status.Active
             };
 
             var result = await userManager.CreateAsync(user, "Password123!");

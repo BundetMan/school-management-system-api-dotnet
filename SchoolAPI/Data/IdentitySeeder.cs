@@ -46,7 +46,7 @@ public static class IdentitySeeder
                 Email = adminEmail,
                 NormalizedEmail = adminEmail.ToUpper(),
                 EmailConfirmed = true,
-                Status = "Active"
+                Status = Status.Active
             };
 
             var result = await userMgr.CreateAsync(admin, adminPass);

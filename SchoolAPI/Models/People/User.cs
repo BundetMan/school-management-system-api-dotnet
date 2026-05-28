@@ -7,7 +7,7 @@ namespace SchoolAPI.Models.People
 {
     public class User : IdentityUser<string>
     {
-        public string Status { get; set; } = default!;
+        public Status Status { get; set; } = Status.Inactive;
 
         public ICollection<Registration> ProcessedRegistrations { get; set; } = new List<Registration>();
         public ICollection<Payment> ReceivedPayments { get; set; } = new List<Payment>();

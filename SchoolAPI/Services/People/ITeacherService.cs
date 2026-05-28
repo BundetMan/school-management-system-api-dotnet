@@ -19,6 +19,7 @@ namespace SchoolAPI.Services.People
         Task<TeacherDto> CreateTeacherAsync(TeacherCreateDto dto);
         Task<TeacherDto> UpdateTeacherAsync(string id, TeacherUpdateDto dto);
         Task DeleteTeacherAsync(string id);
+        Task DeactivateTeacherAsync(string id);
 
         // --- Validation Helpers ---
         Task<bool> TeacherExistsAsync(string id);
