@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
+using SchoolAPI.Models.Curriculum_Bridges;
 using SchoolAPI.Models.People;
 
 namespace SchoolAPI.Repositories.People;
@@ -101,4 +102,5 @@ public class TeacherRepository : ITeacherRepository
         _context.Teachers.Remove(teacher);
         await _context.SaveChangesAsync();
     }
+
 }

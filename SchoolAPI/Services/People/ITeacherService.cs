@@ -24,5 +24,10 @@ namespace SchoolAPI.Services.People
         // --- Validation Helpers ---
         Task<bool> TeacherExistsAsync(string id);
         Task<bool> IsNameTakenAsync(string name, string? excludeId = null);
+
+        //assign teacher to subject class
+        //Task AssignTeacherToSubjectClassAsync(string teacherId, string subjectClassId);
+        //Task UnassignTeacherFromSubjectClassAsync(string teacherId, string subjectClassId);
+        //Task<IEnumerable<TeacherDto>> GetTeachersBySubjectClassAsync(string subjectClassId);
     }
 }

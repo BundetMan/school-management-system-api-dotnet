@@ -149,7 +149,7 @@ namespace SchoolAPI
             app.UseMiddleware<ErrorHandlingMiddleware>();
             #endregion
 
-            #region seeding roles, users, students, registrations, and school levels
+            #region seeder 
             // ---- Seed roles & users here ----
             bool.TryParse(builder.Configuration["IsDataSeeded"], out bool isDataSeeded);
             if (isDataSeeded)
@@ -159,6 +159,7 @@ namespace SchoolAPI
                 await IdentitySeeder.SeedAsync(scope.ServiceProvider);
                 await StudentSeeder.SeedAsync(scope.ServiceProvider);
                 await RegistrationSeeder.SeedAsync(scope.ServiceProvider);
+                await SubjectSeeder.SeedAsync(scope.ServiceProvider);
             }
             #endregion
 

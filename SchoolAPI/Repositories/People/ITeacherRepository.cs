@@ -17,4 +17,9 @@ public interface ITeacherRepository
     Task<Teacher?> GetTeacherWithSchedulesAsync(string id);          // load schedules nav prop
     Task<Teacher?> GetTeacherWithSubjectClassesAsync(string id);     // load assignments nav prop
     Task<IEnumerable<Teacher>> GetPagedTeachersAsync(int page, int pageSize); // pagination
+
+    //assign teacher to subject class
+    //Task AssignToSubjectClassAsync(string teacherId, string subjectClassId);
+    //Task UnassignFromSubjectClassAsync(string teacherId, string subjectClassId);
+    //Task<IEnumerable<Teacher>> GetBySubjectClassAsync(string subjectClassId);
 }

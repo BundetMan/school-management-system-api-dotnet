@@ -54,6 +54,17 @@ namespace SchoolAPI.Repositories.School_Structures
                 .ToListAsync();
         }
 
+        public async Task<Class?> GetByIdWithSubjectsAndTeachersAsync(string id)
+        {
+            return await _context.Classes
+               .Include(c => c.TeacherSubjectClasses)
+                   .ThenInclude(tsc => tsc.Teacher)
+               .Include(c => c.TeacherSubjectClasses)
+                   .ThenInclude(tsc => tsc.Subject)
+                .Where(c => c.Id.ToString() == id && c.Status == ClassStatus.Active)
+               .FirstOrDefaultAsync(c => c.Id.ToString() == id);
+        }
+
         public async Task<Class> AddAsync(Class cls)
         {
             await _context.Classes.AddAsync(cls);
