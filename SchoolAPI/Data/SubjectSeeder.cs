@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 namespace SchoolAPI.Data;
 
 public class SubjectSeeder

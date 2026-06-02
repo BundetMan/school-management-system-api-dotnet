@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.DTOs.Subject;
 using SchoolAPI.Repositories.Subjects;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 
 namespace SchoolAPI.Services.Subjects
 {

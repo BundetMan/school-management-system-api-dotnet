@@ -1,4 +1,4 @@
-﻿using SchoolAPI.Models.Curriculum_Bridges;
+﻿using SchoolAPI.Models.SubjectAndBridge;
 namespace SchoolAPI.Repositories.Subjects;
 
 public interface ISubjectRepository

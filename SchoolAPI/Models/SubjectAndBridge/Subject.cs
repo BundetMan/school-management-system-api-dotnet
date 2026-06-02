@@ -1,6 +1,6 @@
 ﻿using SchoolAPI.Models.Schedules;
 
-namespace SchoolAPI.Models.Curriculum_Bridges
+namespace SchoolAPI.Models.SubjectAndBridge
 {
     public class Subject
     {

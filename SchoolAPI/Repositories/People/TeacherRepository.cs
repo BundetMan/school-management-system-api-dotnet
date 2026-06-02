@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 using SchoolAPI.Models.People;
 
 namespace SchoolAPI.Repositories.People;

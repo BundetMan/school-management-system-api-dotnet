@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using SchoolAPI.Data;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 namespace SchoolAPI.Repositories.Subjects;
 
 public class SubjectRepository : ISubjectRepository

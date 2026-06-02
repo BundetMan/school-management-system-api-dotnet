@@ -1,4 +1,4 @@
-﻿using SchoolAPI.Models.Curriculum_Bridges;
+﻿using SchoolAPI.Models.SubjectAndBridge;
 using SchoolAPI.Models.People;
 using SchoolAPI.Models.School_Structure;
 

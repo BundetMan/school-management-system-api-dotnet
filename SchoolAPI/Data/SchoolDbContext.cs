@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 using SchoolAPI.Models.Enrollment;
 using SchoolAPI.Models.PaymentsWaitlists;
 using SchoolAPI.Models.People;
@@ -283,6 +283,9 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(cs => cs.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(cs => cs.ClassId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(cs => cs.SubjectId).HasColumnType("varchar(50)").IsRequired();
+
+            buildAction.HasIndex(cs => new { cs.ClassId, cs.SubjectId }).IsUnique();
+
             //ClassSubject -> Class (Many-to-One)
             buildAction.HasOne(cs => cs.Class)
                         .WithMany(c => c.ClassSubjects)

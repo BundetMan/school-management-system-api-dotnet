@@ -1,6 +1,6 @@
 ﻿using Mapster;
 using SchoolAPI.DTOs.Subject;
-using SchoolAPI.Models.Curriculum_Bridges;
+using SchoolAPI.Models.SubjectAndBridge;
 
 namespace SchoolAPI.Mappings
 {
@@ -20,6 +20,11 @@ namespace SchoolAPI.Mappings
             config.NewConfig<SubjectCreateDto, Subject>()
                 .Map(dest => dest.Id, src => Guid.NewGuid().ToString());
             config.NewConfig<SubjectUpdateDto, Subject>();
+
+            config.NewConfig<ClassSubject, ClassSubjectResponseDto>()
+                .Map(desc => desc.Id, src => Guid.NewGuid().ToString())
+                .Map(dest => dest.SubjectName, src => src.Subject != null ? src.Subject.Name : null)
+                .Map(dest => dest.SubjectCode, src => src.Subject != null ? src.Subject.Code : null);
         }
     }
 }

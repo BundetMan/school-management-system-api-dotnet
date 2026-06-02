@@ -1,4 +1,4 @@
-﻿using SchoolAPI.Models.Curriculum_Bridges;
+﻿using SchoolAPI.Models.SubjectAndBridge;
 using SchoolAPI.Models.Schedules;
 using System.ComponentModel.DataAnnotations;
 

@@ -3,7 +3,7 @@ using SchoolAPI.Models.School_Structure;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SchoolAPI.Models.Curriculum_Bridges
+namespace SchoolAPI.Models.SubjectAndBridge
 {
     public class TeacherSubjectClass
     {
