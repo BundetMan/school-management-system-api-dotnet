@@ -60,7 +60,7 @@ namespace SchoolAPI.Repositories.School_Structures
                .Include(c => c.TeacherSubjectClasses)
                    .ThenInclude(tsc => tsc.Teacher)
                .Include(c => c.TeacherSubjectClasses)
-                   .ThenInclude(tsc => tsc.Subject)
+                   .ThenInclude(tsc => tsc.ClassSubject)
                 .Where(c => c.Id.ToString() == id && c.Status == ClassStatus.Active)
                .FirstOrDefaultAsync(c => c.Id.ToString() == id);
         }

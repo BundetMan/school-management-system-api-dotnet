@@ -252,11 +252,6 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
                        .HasForeignKey(cs => cs.SubjectId)
                        .OnDelete(DeleteBehavior.Cascade);
 
-            buildAction.HasMany(s => s.TeacherSubjectClasses)
-                        .WithOne(s => s.Subject)
-                        .HasForeignKey(tsc => tsc.SubjectId)
-                        .OnDelete(DeleteBehavior.Cascade);
-
             buildAction.HasMany(s =>s.Schedules)
                         .WithOne(s => s.Subject)
                         .HasForeignKey(tsc => tsc.SubjectId)
@@ -305,22 +300,18 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.HasKey(tsc => tsc.Id);
             buildAction.Property(tsc => tsc.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(tsc => tsc.TeacherId).HasColumnType("varchar(50)").IsRequired();
-            buildAction.Property(tsc => tsc.SubjectId).HasColumnType("varchar(50)").IsRequired();
-            buildAction.Property(tsc => tsc.ClassId).HasColumnType("varchar(50)").IsRequired();
+            buildAction.Property(tsc => tsc.ClassSubjectId).HasColumnType("varchar(50)").IsRequired();
 
-            buildAction.HasOne(tsc => tsc.Subject)
-                        .WithMany(s => s.TeacherSubjectClasses)
-                        .HasForeignKey(tsc => tsc.SubjectId)
+            buildAction.HasIndex(tsc => new { tsc.ClassSubjectId, tsc.TeacherId }).IsUnique();
+
+            buildAction.HasOne(tsc => tsc.ClassSubject)
+                        .WithMany()
+                        .HasForeignKey(tsc => tsc.ClassSubjectId)
                         .OnDelete(DeleteBehavior.Cascade);
 
             buildAction.HasOne(tsc => tsc.Teacher)
                         .WithMany(t => t.TeacherSubjectClasses)
                         .HasForeignKey(tsc => tsc.TeacherId)
-                        .OnDelete(DeleteBehavior.Cascade);
-
-            buildAction.HasOne(tsc => tsc.Class)
-                        .WithMany(c => c.TeacherSubjectClasses)
-                        .HasForeignKey(tsc => tsc.ClassId)
                         .OnDelete(DeleteBehavior.Cascade);
 
             buildAction.ToTable("TeacherSubjectClasses");

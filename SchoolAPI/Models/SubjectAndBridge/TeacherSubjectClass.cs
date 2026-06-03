@@ -9,17 +9,11 @@ namespace SchoolAPI.Models.SubjectAndBridge
     {
         public string Id { get; set; } = default!;
 
-        [Required]
+        public string ClassSubjectId { get; set; } = default!;
+        public ClassSubject ClassSubject { get; set; } = default!;
+
         public string TeacherId { get; set; } = default!;
         public Teacher Teacher { get; set; } = default!;
-
-        [Required]
-        public string SubjectId { get; set; } = default!;
-        public Subject Subject { get; set; } = default!;
-
-        [Required]
-        public string ClassId { get; set; } = default!;
-        public Class Class { get; set; } = default!;
     }
 
 }

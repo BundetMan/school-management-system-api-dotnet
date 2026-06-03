@@ -18,6 +18,14 @@ namespace SchoolAPI.Repositories.ClassSubjects
                 .Include(cs => cs.Subject)
                 .ToListAsync();
         }
+
+        public async Task<ClassSubject?> GetByIdAsync(string id)
+        {
+            return await _context.ClassSubjects
+                .Include(cs => cs.Subject)
+                .Include(cs => cs.Class)
+                .FirstOrDefaultAsync(cs => cs.Id == id);
+        }
         public async Task AddRangeAsync(IEnumerable<ClassSubject> classSubjects)
         {
             _context.ClassSubjects.AddRange(classSubjects);

@@ -25,6 +25,8 @@ using System.Text.Json.Serialization;
 using SchoolAPI.Repositories.People;
 using SchoolAPI.Repositories.ClassSubjects;
 using SchoolAPI.Services.ClassSubjects;
+using SchoolAPI.Repositories.TeacherSubjectClasses;
+using SchoolAPI.Services.TeacherSubjectClasses;
 
 
 namespace SchoolAPI
@@ -78,6 +80,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<ITeacherService, TeacherService>();
             builder.Services.AddScoped<IClassSubjectRepository, ClassSubjectRepository>();
             builder.Services.AddScoped<IClassSubjectService, ClassSubjectService>();
+            builder.Services.AddScoped<ITeacherSubjectClassRepository, TeacherSubjectClassRepository>();
+            builder.Services.AddScoped<ITeacherSubjectClassService, TeacherSubjectClassService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 

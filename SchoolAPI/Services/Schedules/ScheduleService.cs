@@ -141,7 +141,7 @@ public class ScheduleService : IScheduleService
             schedules.Add(new Schedule
             {
                 ClassId = request.ClassId,
-                SubjectId = ts.SubjectId,
+                SubjectId = ts.ClassSubjectId,
                 TeacherId = ts.TeacherId,
                 Day = day,
                 StartTime = start,

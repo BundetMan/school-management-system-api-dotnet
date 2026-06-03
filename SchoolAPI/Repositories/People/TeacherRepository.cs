@@ -73,9 +73,7 @@ public class TeacherRepository : ITeacherRepository
         return await _context.Teachers
             .AsNoTracking()
             .Include(t => t.TeacherSubjectClasses)
-                .ThenInclude(tsc => tsc.Subject)
-            .Include(t => t.TeacherSubjectClasses)
-                .ThenInclude(tsc => tsc.Class)
+                .ThenInclude(tsc => tsc.ClassSubject)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
