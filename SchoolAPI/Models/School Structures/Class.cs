@@ -20,7 +20,6 @@ namespace SchoolAPI.Models.School_Structure
 
         public ICollection<Student> Students { get; set; } = default!;
         public ICollection<ClassSubject> ClassSubjects { get; set; } = default!;
-        public ICollection<TeacherSubjectClass> TeacherSubjectClasses { get; set; } = default!;
         public ICollection<Schedule> Schedules { get; set; } = default!;
         public ICollection<Registration> Registrations { get; set; } = default!;
         public ICollection<Waitlist> Waitlists { get; set; } = default!;

@@ -305,7 +305,7 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.HasIndex(tsc => new { tsc.ClassSubjectId, tsc.TeacherId }).IsUnique();
 
             buildAction.HasOne(tsc => tsc.ClassSubject)
-                        .WithMany()
+                        .WithMany(cs => cs.TeacherSubjectClasses)
                         .HasForeignKey(tsc => tsc.ClassSubjectId)
                         .OnDelete(DeleteBehavior.Cascade);
 

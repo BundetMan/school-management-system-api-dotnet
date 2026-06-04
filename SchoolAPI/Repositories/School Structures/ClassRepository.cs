@@ -57,12 +57,13 @@ namespace SchoolAPI.Repositories.School_Structures
         public async Task<Class?> GetByIdWithSubjectsAndTeachersAsync(string id)
         {
             return await _context.Classes
-               .Include(c => c.TeacherSubjectClasses)
-                   .ThenInclude(tsc => tsc.Teacher)
-               .Include(c => c.TeacherSubjectClasses)
-                   .ThenInclude(tsc => tsc.ClassSubject)
-                .Where(c => c.Id.ToString() == id && c.Status == ClassStatus.Active)
-               .FirstOrDefaultAsync(c => c.Id.ToString() == id);
+                .Include(c => c.ClassSubjects)
+                    .ThenInclude(cs => cs.TeacherSubjectClasses)
+                        .ThenInclude(tsc => tsc.Teacher)
+
+                .FirstOrDefaultAsync(c =>
+                    c.Id == id &&
+                    c.Status == ClassStatus.Active);
         }
 
         public async Task<Class> AddAsync(Class cls)

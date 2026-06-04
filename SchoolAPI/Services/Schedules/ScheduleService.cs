@@ -107,7 +107,9 @@ public class ScheduleService : IScheduleService
         var @class = await _classRepo.GetByIdWithSubjectsAndTeachersAsync(request.ClassId)
             ?? throw new KeyNotFoundException($"Class '{request.ClassId}' not found.");
 
-        var teacherSubjects = @class.TeacherSubjectClasses.ToList();
+        var teacherSubjects = @class.ClassSubjects
+            .SelectMany(cs => cs.TeacherSubjectClasses)
+            .ToList();
 
         if (teacherSubjects.Count < 2 || teacherSubjects.Count > 6)
             throw new InvalidOperationException(
