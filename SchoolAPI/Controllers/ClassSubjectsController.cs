@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using SchoolAPI.DTOs.Subject;
+using SchoolAPI.DTOs.ClassSubject;
 using SchoolAPI.Services.ClassSubjects;
 
 namespace SchoolAPI.Controllers
@@ -16,7 +16,7 @@ namespace SchoolAPI.Controllers
             _classSubjectService = classSubjectService;
         }
         [HttpPost("{classId}/subjects")]
-        public async Task<IActionResult> AssignSubjects(string classId, [FromBody] AssignSubjectsRequestDto request)
+        public async Task<IActionResult> AssignSubjects(string classId, [FromBody] ClassSubjectsCreateDto request)
         {
             request.ClassId = classId;
             await _classSubjectService.AssignSubjects(request);

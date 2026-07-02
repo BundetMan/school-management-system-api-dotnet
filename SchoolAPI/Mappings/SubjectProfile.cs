@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using SchoolAPI.DTOs.ClassSubject;
 using SchoolAPI.DTOs.Subject;
 using SchoolAPI.Models.SubjectAndBridge;
 

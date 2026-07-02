@@ -58,6 +58,9 @@ namespace SchoolAPI.Repositories.School_Structures
         {
             return await _context.Classes
                 .Include(c => c.ClassSubjects)
+                    .ThenInclude(cs => cs.Subject)
+
+                .Include(c => c.ClassSubjects)
                     .ThenInclude(cs => cs.TeacherSubjectClasses)
                         .ThenInclude(tsc => tsc.Teacher)
 
@@ -84,6 +87,11 @@ namespace SchoolAPI.Repositories.School_Structures
             _context.Classes.Remove(cls);
             await _context.SaveChangesAsync();
         }
-    }
+
+        public async Task<bool> ExistsAsync(string id)
+        {
+            return await _context.Classes.AnyAsync(c => c.Id == id && c.Status == ClassStatus.Active);
+        }
+}
 }
 

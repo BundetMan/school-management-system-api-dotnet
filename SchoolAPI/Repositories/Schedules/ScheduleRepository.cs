@@ -18,6 +18,7 @@ public class ScheduleRepository : IScheduleRepository
             .Include(s => s.Class)
             .Include(s => s.Subject)
             .Include(s => s.Teacher)
+            .OrderBy(s => s.Day)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
     
@@ -69,6 +70,7 @@ public class ScheduleRepository : IScheduleRepository
         => await _dbContext.Schedules
             .Include(s => s.Subject)
             .Include(s => s.Teacher)
+            .Include(s => s.Class)
             .Where(s => s.ClassId == classId)
             .OrderBy(s => s.Day)
             .ThenBy(s => s.StartTime)
@@ -78,6 +80,7 @@ public class ScheduleRepository : IScheduleRepository
         => await _dbContext.Schedules
             .Include(s => s.Class)
             .Include(s => s.Subject)
+            .Include(s => s.Teacher)
             .Where(s => s.TeacherId == teacherId)
             .OrderBy(s => s.Day)
             .ThenBy(s => s.StartTime)
@@ -124,12 +127,7 @@ public class ScheduleRepository : IScheduleRepository
             .AnyAsync();
 
     public async Task DeleteByClassIdAsync(string classId)
-    {
-        var schedules = await _dbContext.Schedules
+         => await _dbContext.Schedules
             .Where(s => s.ClassId == classId)
-            .ToListAsync();
-
-        _dbContext.Schedules.RemoveRange(schedules);
-        await _dbContext.SaveChangesAsync();
-    }
+            .ExecuteDeleteAsync();
 }

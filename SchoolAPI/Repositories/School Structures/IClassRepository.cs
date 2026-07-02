@@ -13,6 +13,7 @@ namespace SchoolAPI.Repositories.School_Structures
         Task<Class> AddAsync(Class cls);
         Task UpdateAsync(Class cls);
         Task DeleteAsync(Class cls);
+        Task<bool> ExistsAsync(string classId);
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using SchoolAPI.DTOs.Schedule;
+using SchoolAPI.Models.Schedules;
 
 namespace SchoolAPI.Services.Schedules;
 
@@ -14,4 +15,6 @@ public interface IScheduleService
     Task DeleteAsync(string id);
 
     Task<IEnumerable<ScheduleResponseDto>> AutoGenerateAsync(AutoGenerateScheduleRequestDto request);
+
+    Task<IEnumerable<ScheduleSlotDtoForManualCreation>> GetDaySlotsAsync(string classId, SchoolDay day);
 }

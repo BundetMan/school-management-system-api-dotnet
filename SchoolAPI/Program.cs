@@ -153,7 +153,6 @@ namespace SchoolAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            //builder.Services.AddOpenApi();
 
             var app = builder.Build();
 
@@ -172,6 +171,9 @@ namespace SchoolAPI
                 await StudentSeeder.SeedAsync(scope.ServiceProvider);
                 await RegistrationSeeder.SeedAsync(scope.ServiceProvider);
                 await SubjectSeeder.SeedAsync(scope.ServiceProvider);
+                await ClassSubjectSeeder.SeedAsync(scope.ServiceProvider);
+                await TeacherSeeder.SeedAsync(scope.ServiceProvider);
+                await TeacherSubjectClassSeeder.SeedAsync(scope.ServiceProvider);
             }
             #endregion
 
@@ -180,8 +182,6 @@ namespace SchoolAPI
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-                //app.MapOpenApi();
-                //app.MapScalarApiReference();
             }
 
             app.UseHttpsRedirection();

@@ -6,7 +6,7 @@ namespace SchoolAPI.Models.Schedules
 {
     public class Schedule
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public SchoolDay Day { get; set; }
         public TimeSpan StartTime { get; set; }
@@ -20,10 +20,10 @@ namespace SchoolAPI.Models.Schedules
         public string ClassId { get; set; } = default!;
         public Class Class { get; set; } = default!;
 
-        public string SubjectId { get; set; } = default!;
+        public string? SubjectId { get; set; }
         public Subject Subject { get; set; } = default!;
 
-        public string TeacherId { get; set; } = default!;
+        public string? TeacherId { get; set; }
         public Teacher Teacher { get; set; } = default!;
     }
 }

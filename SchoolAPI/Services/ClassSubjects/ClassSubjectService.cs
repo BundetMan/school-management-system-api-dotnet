@@ -1,5 +1,5 @@
 ﻿using Mapster;
-using SchoolAPI.DTOs.Subject;
+using SchoolAPI.DTOs.ClassSubject;
 using SchoolAPI.Models.SubjectAndBridge;
 using SchoolAPI.Repositories.ClassSubjects;
 
@@ -12,7 +12,7 @@ namespace SchoolAPI.Services.ClassSubjects
         {
             _repository = repository;
         }
-        public async Task AssignSubjects(AssignSubjectsRequestDto dto)
+        public async Task AssignSubjects(ClassSubjectsCreateDto dto)
         {
             await _repository.RemoveByClassIdAsync(dto.ClassId);
             var classSubjects = dto.SubjectIds.Select(subjectId => new ClassSubject

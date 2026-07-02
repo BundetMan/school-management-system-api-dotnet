@@ -1,10 +1,10 @@
-﻿using SchoolAPI.DTOs.Subject;
+﻿using SchoolAPI.DTOs.ClassSubject;
 
 namespace SchoolAPI.Services.ClassSubjects
 {
     public interface IClassSubjectService
     {
-        Task AssignSubjects(AssignSubjectsRequestDto dto);
+        Task AssignSubjects(ClassSubjectsCreateDto dto);
         Task<IEnumerable<ClassSubjectResponseDto>> GetSubjectsByClassId(string classId);
     }
 }

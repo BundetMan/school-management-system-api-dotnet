@@ -16,6 +16,7 @@ namespace SchoolAPI.Repositories.ClassSubjects
             return await _context.ClassSubjects
                 .Where(cs => cs.ClassId == classId)
                 .Include(cs => cs.Subject)
+                .Include(cs => cs.Class)
                 .ToListAsync();
         }
 

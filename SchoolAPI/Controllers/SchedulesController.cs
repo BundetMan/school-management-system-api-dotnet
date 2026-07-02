@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.Schedule;
+using SchoolAPI.Models.Schedules;
 using SchoolAPI.Services.Schedules;
 
 namespace SchoolAPI.Controllers
@@ -75,6 +76,14 @@ namespace SchoolAPI.Controllers
         {
             await _scheduleService.DeleteAsync(id);
             return NoContent();
+        }
+
+        [HttpGet("{classId}/days/{day}/slots")]
+        public async Task<ActionResult<IEnumerable<ScheduleSlotDtoForManualCreation>>> GetDaySlots(
+            string classId, SchoolDay day)
+        {
+            var result = await _scheduleService.GetDaySlotsAsync(classId, day);
+            return Ok(result);
         }
     }
 }
