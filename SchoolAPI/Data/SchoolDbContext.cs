@@ -20,7 +20,6 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
     // People
     public DbSet<Student> Students { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
-    //public DbSet<User> Users { get; set; }
 
     // Curriculum Bridges
     public DbSet<Subject> Subjects { get; set; }
@@ -386,11 +385,11 @@ public class SchoolDbContext(DbContextOptions<SchoolDbContext> options) : DbCont
             buildAction.Property(p => p.Id).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(p => p.StudentId).HasColumnType("varchar(50)").IsRequired();
             buildAction.Property(p => p.Type).HasColumnType("nvarchar(20)").IsRequired();
-            buildAction.Property(p => p.Method).HasColumnType("varchar(20)").IsRequired();
+            buildAction.Property(p => p.Method).HasConversion<string>().IsRequired();
             buildAction.Property(p => p.Amount).HasColumnType("decimal(18,2)").IsRequired();
             buildAction.Property(p => p.ReferenceNumber).HasColumnType("varchar(50)").IsRequired(false);
             buildAction.Property(p => p.SlipURL).HasColumnType("varchar(255)").IsRequired(false);
-            buildAction.Property(p => p.Status).HasColumnType("nvarchar(20)").IsRequired().HasDefaultValue("Pending");
+            buildAction.Property(p => p.Status).HasConversion<string>().IsRequired();
             buildAction.Property(p => p.ReceivedBy).IsRequired();
             buildAction.Property(p => p.VerifiedBy).IsRequired(false);
             buildAction.Property(p => p.PaidAt).HasColumnType("datetime2").IsRequired(false);

@@ -29,6 +29,8 @@ using SchoolAPI.Repositories.TeacherSubjectClasses;
 using SchoolAPI.Services.TeacherSubjectClasses;
 using SchoolAPI.Repositories.Schedules;
 using SchoolAPI.Services.Schedules;
+using SchoolAPI.Repositories.Payments;
+using SchoolAPI.Services.Payments;
 
 
 namespace SchoolAPI
@@ -86,6 +88,8 @@ namespace SchoolAPI
             builder.Services.AddScoped<ITeacherSubjectClassService, TeacherSubjectClassService>();
             builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
             builder.Services.AddScoped<IScheduleService, ScheduleService>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
 
