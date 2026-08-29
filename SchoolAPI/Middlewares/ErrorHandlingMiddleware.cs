@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 namespace SchoolAPI.Middlewares;
 
@@ -27,6 +29,10 @@ public class ErrorHandlingMiddleware
                 ValidationException => 400,
                 KeyNotFoundException => 404,
                 InvalidOperationException => 409,
+                DbUpdateException dbEx when
+                    dbEx.InnerException is SqlException sql &&
+                    (sql.Number == 2601 || sql.Number == 2627)
+                    => 409, // Duplicate key
                 UnauthorizedAccessException => 401,
                 _ => 500
             };

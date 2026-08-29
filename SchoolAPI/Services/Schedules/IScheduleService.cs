@@ -12,9 +12,10 @@ public interface IScheduleService
 
     Task<ScheduleResponseDto> CreateAsync(ScheduleRequestCreateDto request);
     Task<ScheduleResponseDto> UpdateAsync(string id, ScheduleRequestUpdateDto request);
-    Task DeleteAsync(string id);
+    Task<bool> DeleteAsync(string id);
 
     Task<IEnumerable<ScheduleResponseDto>> AutoGenerateAsync(AutoGenerateScheduleRequestDto request);
 
+    //useful for manual schedule creation, returns all slots for a given day and class, including occupied and free slots
     Task<IEnumerable<ScheduleSlotDtoForManualCreation>> GetDaySlotsAsync(string classId, SchoolDay day);
 }

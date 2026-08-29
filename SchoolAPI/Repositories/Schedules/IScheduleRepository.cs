@@ -14,6 +14,7 @@ public interface IScheduleRepository
 
     Task<IEnumerable<Schedule>> GetByClassIdAsync(string classId);
     Task<IEnumerable<Schedule>> GetByTeacherIdAsync(string teacherId);
+    Task<IEnumerable<TeacherSlot>> GetTeacherBusySlotsAsync(IEnumerable<string> teacherIds);
     Task<IEnumerable<Schedule>> GetByClassAndDayAsync(string classId, SchoolDay day);
     Task<IEnumerable<Schedule>> GetByTeacherAndDayAsync(string teacherId, SchoolDay day);
 
@@ -24,3 +25,4 @@ public interface IScheduleRepository
     // Bulk replace (for auto-generation)
     Task DeleteByClassIdAsync(string classId);
 }
+public record TeacherSlot(string TeacherId, SchoolDay Day, TimeSpan StartTime, string ClassId);

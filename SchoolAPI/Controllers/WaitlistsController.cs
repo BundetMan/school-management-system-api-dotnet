@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.Waitlist;
 using SchoolAPI.Services.Registrations;
@@ -9,6 +10,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class WaitlistsController : ControllerBase
     {
         private readonly IWaitlistService _waitlistService;
@@ -27,6 +29,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<WaitlistDto>> GetById(string id)
         {
             var waitlist = await _waitlistService.GetWaitlistByIdAsync(id);
@@ -35,6 +38,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("student/{studentId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<WaitlistDto>>> GetByStudentId(string studentId)
         {
             var waitlists = await _waitlistService.GetWaitlistsByStudentIdAsync(studentId);
@@ -42,6 +46,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("class/{classId}")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<WaitlistDto>>> GetByClassId(string classId)
         {
             var waitlists = await _waitlistService.GetWaitlistsByClassIdAsync(classId);
@@ -58,8 +63,7 @@ namespace SchoolAPI.Controllers
         [HttpPost("{id}/promote")]
         public async Task<IActionResult> Promote(string id)
         {
-            //var promotedBy = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var promotedBy = "ADMINC8F-D914-483D-BF41-7DA09ABAA4DC"; // For simplicity, using a hardcoded value. In real scenarios, use the authenticated user's ID.
+            var promotedBy = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             await _registrationService.PromoteFromWaitlistAsync(id, promotedBy);
             return NoContent();
         }

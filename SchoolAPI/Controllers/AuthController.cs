@@ -76,11 +76,5 @@ namespace SchoolAPI.Controllers
         }
         */
         #endregion
-
-        [HttpGet("test")]
-        public async Task<ActionResult> Test()
-        {
-            return StatusCode(500);
-        }
     }
 }

@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.Models.School_Structure;
 using SchoolAPI.DTOs.School_Structures;
 using SchoolAPI.Services.School_Structures;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminRole")]
     public class SchoolLevelsController : ControllerBase
     {
         private readonly ISchoolLevelService _service;

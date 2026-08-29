@@ -25,7 +25,7 @@ public class TeacherSeeder
             new { Name = "Rithy Nhem",    Specialization = "Physical Education" },
             new { Name = "Sopheak Mean",  Specialization = "Civics and Moral education" },
             new { Name = "Malis Touch",   Specialization = "Biology" },
-            new { Name = "Visal Keo",     Specialization = "Physical Education" },
+            new { Name = "Sokun Rath", Specialization = "Physics" },
         };
 
         var teachers = new List<Teacher>();

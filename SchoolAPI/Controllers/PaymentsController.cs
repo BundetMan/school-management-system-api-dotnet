@@ -9,12 +9,14 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _service;
         public PaymentsController(IPaymentService service) => _service = service;
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> Get(string id, bool details = false)
         {
             var payment = details 
@@ -24,18 +26,13 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPost("office")]
-        //[Authorize(Policy = "RequireAdminRole")]
         public async Task<ActionResult<PaymentResponseDto>> RecordOffice(CreateOfficePaymentDto dto)
             => Ok(await _service.RecordOfficePaymentAsync(dto));
 
         [HttpPost("online")]
-        //[Authorize]
         public async Task<ActionResult<PaymentResponseDto>> SubmitOnline(CreateOnlinePaymentDto dto)
         {
-            //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            // TEMP for local testing without auth — remove before enabling [Authorize]
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "ADMINC8F-D914-483D-BF41-7DA09ABAA4DC";
-
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             return Ok(await _service.SubmitOnlinePaymentAsync(dto, userId));
         }
 
@@ -44,7 +41,6 @@ namespace SchoolAPI.Controllers
             => Ok(await _service.GetPendingPaymentsAsync());
 
         [HttpPost("verify")]
-        //[Authorize(Roles = "admin,staff")]
         public async Task<ActionResult<PaymentResponseDto>> Verify(VerifyPaymentDto dto)
             => Ok(await _service.VerifyPaymentAsync(dto));
 

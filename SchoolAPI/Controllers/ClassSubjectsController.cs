@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.ClassSubject;
@@ -8,6 +9,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminRole")]
     public class ClassSubjectsController : ControllerBase
     {
         private readonly IClassSubjectService _classSubjectService;
@@ -15,10 +17,10 @@ namespace SchoolAPI.Controllers
         {
             _classSubjectService = classSubjectService;
         }
-        [HttpPost("{classId}/subjects")]
-        public async Task<IActionResult> AssignSubjects(string classId, [FromBody] ClassSubjectsCreateDto request)
+        [HttpPost]
+        public async Task<IActionResult> AssignSubjects([FromBody] ClassSubjectsCreateDto request)
         {
-            request.ClassId = classId;
+            //request.ClassId = classId;
             await _classSubjectService.AssignSubjects(request);
             return Ok();
         }

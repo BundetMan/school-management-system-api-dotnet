@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.Subject;
 using SchoolAPI.Services.Subjects;
@@ -7,6 +8,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class SubjectsController : ControllerBase
     {
         private readonly ISubjectService _subjectService;
@@ -16,6 +18,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<SubjectDto>>> GetAllSubjects()
         {
             var subjects = await _subjectService.GetAllSubjects();
@@ -23,6 +26,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetSubjectById(string id)
         {
             var subject = await _subjectService.GetBySubjectId(id);
@@ -30,6 +34,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("code/{code}")]
+        [Authorize]
         public async Task<IActionResult> GetSubjectByCode(string code)
         {
             var subject = await _subjectService.GetBySubjectCode(code);
@@ -37,6 +42,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("name/{name}")]
+        [Authorize]
         public async Task<IActionResult> GetSubjectByName(string name)
         {
             var subject = await _subjectService.GetBySubjectName(name);

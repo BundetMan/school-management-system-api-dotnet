@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.Enrollment;
 using SchoolAPI.Services.Enrollments;
@@ -7,6 +8,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EnrollmentsController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;
@@ -16,6 +18,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<ActionResult> GetAll()
         {
             var results = await _enrollmentService.GetAllAsync();
@@ -51,6 +54,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPatch("{id}/drop")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Drop(string id, [FromBody] EnrollmentDropDto dto)
         {
             var result = await _enrollmentService.DropAsync(id, dto);
@@ -58,6 +62,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPatch("{id}/complete")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Complete(string id)
         {
             var result = await _enrollmentService.CompleteAsync(id);

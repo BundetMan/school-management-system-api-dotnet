@@ -7,9 +7,9 @@ using SchoolAPI.Services.Registrations;
 
 namespace SchoolAPI.Controllers
 {
-    //[Authorize(Policy = "RequireAdminRole")]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class RegistrationController : ControllerBase
     {
         private readonly IRegistrationService _service;
@@ -26,6 +26,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(string id)
         {
             var registration = await _service.GetByIdAsync(id);
@@ -36,6 +37,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("student/{studentId}")]
+        [Authorize]
         public async Task<IActionResult> GetByStudentId(string studentId)
         {
             var registrations = await _service.GetByStudentIdAsync(studentId);
@@ -47,6 +49,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("class/{classId}")]
+        [Authorize]
         public async Task<IActionResult> GetByClassId(string classId)
         {
             var registrations = await _service.GetByClassIdAsync(classId);
@@ -67,6 +70,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] RegistrationCreateDto createDto)
         {
             var created = await _service.CreateAsync(createDto);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.People;
 using SchoolAPI.Services.People;
@@ -7,6 +8,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class TeachersController : ControllerBase
     {
         private readonly ITeacherService _teacherService;
@@ -23,6 +25,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("active")]
+        [Authorize(Policy = "RequireAdminRole")] // Only Admin can access this endpoint
         public async Task<IActionResult> GetActive()
         {
             var teachers = await _teacherService.GetActiveTeachersAsync();
@@ -70,6 +73,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Create([FromBody] TeacherCreateDto dto)
         {
             var teacher = await _teacherService.CreateTeacherAsync(dto);
@@ -77,6 +81,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Update(string id, [FromBody] TeacherUpdateDto dto)
         {
             var teacher = await _teacherService.UpdateTeacherAsync(id, dto);
@@ -84,6 +89,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Delete(string id)
         {
             await _teacherService.DeleteTeacherAsync(id);
@@ -91,6 +97,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpDelete("{id}/deactivate")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Deactivate(string id)
         {
             await _teacherService.DeactivateTeacherAsync(id);

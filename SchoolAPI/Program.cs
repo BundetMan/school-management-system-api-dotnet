@@ -31,6 +31,8 @@ using SchoolAPI.Repositories.Schedules;
 using SchoolAPI.Services.Schedules;
 using SchoolAPI.Repositories.Payments;
 using SchoolAPI.Services.Payments;
+using SchoolAPI.Services.Reports;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace SchoolAPI
@@ -91,6 +93,10 @@ namespace SchoolAPI
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+            // Report dashboard service
+            builder.Services.AddScoped<IDashboardReportService, DashboardReportService>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ITokenService, TokenService>();
 
             #endregion
@@ -144,12 +150,13 @@ namespace SchoolAPI
             #region configuration authorization policies
             builder.Services.AddAuthorization(options =>
             {
-                //options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                //    .RequireAuthenticatedUser()
-                //    .Build();
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
                 options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("RequireTeacherRole", policy => policy.RequireRole("Teacher"));
                 options.AddPolicy("RequireStudentRole", policy => policy.RequireRole("Student"));
+                options.AddPolicy("RequireAdminOrTeacherRole", policy => policy.RequireRole("Admin", "Teacher"));
             });
 
             #endregion
@@ -170,14 +177,22 @@ namespace SchoolAPI
             if (isDataSeeded)
             {
                 using var scope = app.Services.CreateScope();
+
                 await SchoolSeeder.SeedAsync(scope.ServiceProvider);
-                await IdentitySeeder.SeedAsync(scope.ServiceProvider);
-                await StudentSeeder.SeedAsync(scope.ServiceProvider);
-                await RegistrationSeeder.SeedAsync(scope.ServiceProvider);
+
+                await IdentitySeeder.SeedAsync(scope.ServiceProvider, builder.Configuration);
+
                 await SubjectSeeder.SeedAsync(scope.ServiceProvider);
-                await ClassSubjectSeeder.SeedAsync(scope.ServiceProvider);
+
                 await TeacherSeeder.SeedAsync(scope.ServiceProvider);
-                await TeacherSubjectClassSeeder.SeedAsync(scope.ServiceProvider);
+
+                await ClassSubjectSeeder.SeedAsync(scope.ServiceProvider);
+
+                await TeacherSubjectClassSeederV2.SeedAsync(scope.ServiceProvider);
+
+                await StudentSeeder.SeedAsync(scope.ServiceProvider);
+
+                await RegistrationSeeder.SeedAsync(scope.ServiceProvider);
             }
             #endregion
 

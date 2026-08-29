@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.TeacherSubjectClasses;
 using SchoolAPI.Services.TeacherSubjectClasses;
@@ -7,6 +8,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminOrTeacherRole")]
     public class TeacherSubjectClassController : ControllerBase
     {
         private readonly ITeacherSubjectClassService _service;

@@ -9,6 +9,6 @@ namespace SchoolAPI.Models.Registrations
         
         Approved,
         
-        Rejected
+        Rejected,
     }
 }

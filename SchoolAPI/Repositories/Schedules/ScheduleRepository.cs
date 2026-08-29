@@ -86,6 +86,12 @@ public class ScheduleRepository : IScheduleRepository
             .ThenBy(s => s.StartTime)
             .ToListAsync();
 
+    public async Task<IEnumerable<TeacherSlot>> GetTeacherBusySlotsAsync(IEnumerable<string> teacherIds)
+         => await _dbContext.Schedules
+        .Where(s => teacherIds.Contains(s.TeacherId))
+        .Select(s => new TeacherSlot(s.TeacherId, s.Day, s.StartTime, s.ClassId))
+        .ToListAsync();
+
     public async Task<IEnumerable<Schedule>> GetByClassAndDayAsync(string classId, SchoolDay day)
         => await _dbContext.Schedules
             .Include(s => s.Subject)

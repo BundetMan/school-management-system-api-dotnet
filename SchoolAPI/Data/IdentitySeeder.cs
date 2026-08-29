@@ -5,7 +5,7 @@ namespace SchoolAPI.Data;
 
 public static class IdentitySeeder
 {
-    public static async Task SeedAsync(IServiceProvider serviceProvider)
+    public static async Task SeedAsync(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         var roleMgr = serviceProvider.GetRequiredService<RoleManager<Role>>();
         var userMgr = serviceProvider.GetRequiredService<UserManager<User>>();
@@ -31,8 +31,8 @@ public static class IdentitySeeder
         // 3. Admin user
         const string adminId = "ADMINC8F-D914-483D-BF41-7DA09ABAA4DC";
         const string adminUser = "admin";
-        const string adminEmail = "admin@example.com";
-        const string adminPass = "Admin123!"; // Change in production
+        string adminEmail = configuration["AdminUser:Email"] ?? "admin@example.com";
+        string adminPass = configuration["AdminUser:Password"] ?? "Admin123!"; // Change in production
 
         var admin = await userMgr.FindByNameAsync(adminUser);
 

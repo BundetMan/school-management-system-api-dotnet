@@ -19,7 +19,7 @@ public class ClassSubjectSeeder
             return;
         }
 
-        const int subjectsPerClass = 9; // adjust between 2–9
+        const int subjectsPerClass = 10; // adjust between 2–10
         var classSubjects = new List<ClassSubject>();
         foreach (var (cls, ci) in classes.Select((c, i) => (c, i)))
         {

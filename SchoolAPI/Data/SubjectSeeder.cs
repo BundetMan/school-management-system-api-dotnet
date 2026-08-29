@@ -16,7 +16,7 @@ public class SubjectSeeder
             new Subject { Id = Guid.NewGuid().ToString(), Name = "Chemistry", Code = "CHE" },
             new Subject { Id = Guid.NewGuid().ToString(), Name = "History", Code = "HIS" },
             new Subject { Id = Guid.NewGuid().ToString(), Name = "Geography", Code = "GEO" },
-            new Subject { Id = Guid.NewGuid().ToString(), Name = "Physical", Code = "PHY" },
+            new Subject { Id = Guid.NewGuid().ToString(), Name = "Physics", Code = "PHY" },
             new Subject { Id = Guid.NewGuid().ToString(), Name = "Civics and Moral education", Code = "CME" },
             new Subject { Id = Guid.NewGuid().ToString(), Name = "Biology", Code = "BIO" },
             new Subject { Id = Guid.NewGuid().ToString(), Name = "Physical Education", Code = "PE" },

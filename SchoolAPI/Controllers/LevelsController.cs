@@ -1,5 +1,6 @@
 ﻿
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.School_Structures;
 using SchoolAPI.Services.School_Structures;
@@ -8,6 +9,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminRole")]
     public class LevelsController(ILevelService service) : ControllerBase
     {
         private readonly ILevelService _service = service;

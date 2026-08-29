@@ -12,9 +12,12 @@ namespace SchoolAPI.Mappings
             .Map(dest => dest.Day, src => src.Day.ToString())
             .Map(dest => dest.StartTime, src => src.StartTime.ToString(@"hh\:mm"))
             .Map(dest => dest.EndTime, src => src.EndTime.ToString(@"hh\:mm"))
+            .Map(dest => dest.IsFreePeriod, src => src.SubjectId == null)
             .Map(dest => dest.Class, src => new ClassSummaryDto(src.Class.Id, src.Class.Name))
-            .Map(dest => dest.Subject, src => new SubjectSummaryDto(src.Subject.Id, src.Subject.Name, src.Subject.Code))
-            .Map(dest => dest.Teacher, src => new TeacherSummaryDto(src.Teacher.Id, src.Teacher.Name, src.Teacher.Specialization));
+            .Map(dest => dest.Subject, src => src.Subject == null ? null
+                : new SubjectSummaryDto(src.Subject.Id, src.Subject.Name, src.Subject.Code))
+            .Map(dest => dest.Teacher, src => src.Teacher == null ? null
+                : new TeacherSummaryDto(src.Teacher.Id, src.Teacher.Name, src.Teacher.Specialization));
 
             config.NewConfig<ScheduleRequestCreateDto, Schedule>()
                 .Ignore(dest => dest.Id)

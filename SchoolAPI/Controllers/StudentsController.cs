@@ -10,6 +10,7 @@ namespace SchoolAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy = "RequireAdminOrTeacherRole")]
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _studentService;
@@ -26,6 +27,7 @@ public class StudentsController : ControllerBase
         return Ok(students);
     }
     [HttpGet("by-id/{id}")]
+    [Authorize]
     public async Task<IActionResult> GetById(string id)
     {
         var student = await _studentService.GetByIdAsync(id);
@@ -34,6 +36,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet("by-code/{code}")]
+    [Authorize]
     public async Task<IActionResult> GetByCode(string code)
     {
         var student = await _studentService.GetCodeAsync(code);
@@ -41,6 +44,7 @@ public class StudentsController : ControllerBase
         return Ok(student);
     }
     [HttpGet("search")]
+    [Authorize]
     public async Task<IActionResult> Search(
         string? code = null,
         string? latinName = null,
@@ -53,6 +57,7 @@ public class StudentsController : ControllerBase
         return Ok(result);
     }
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<StudentDetailDto>> Create(StudentCreateDto dto)
     {
         var createdStudent = await _studentService.RegisterStudentAsync(dto);
@@ -62,6 +67,7 @@ public class StudentsController : ControllerBase
     }
    
     [HttpPut("{code}")]
+    [Authorize]
     public async Task<IActionResult> Update(string code, StudentUpdateDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);

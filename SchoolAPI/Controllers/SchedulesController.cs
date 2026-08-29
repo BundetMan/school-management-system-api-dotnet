@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolAPI.DTOs.Schedule;
 using SchoolAPI.Models.Schedules;
@@ -8,6 +9,7 @@ namespace SchoolAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminRole")] // Only Admin can access this controller
     public class SchedulesController : ControllerBase
     {
         private readonly IScheduleService _scheduleService;
@@ -17,6 +19,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var schedules = await _scheduleService.GetAllAsync();
@@ -24,6 +27,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetSchedule(string id)
         {
             var schedule = await _scheduleService.GetByIdAsync(id);
@@ -35,6 +39,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("by-class/{classId}")]
+        [Authorize]
         public async Task<IActionResult> GetSchedulesByClass(string classId)
         {
             var schedules = await _scheduleService.GetByClassIdAsync(classId);
@@ -42,6 +47,7 @@ namespace SchoolAPI.Controllers
         }
 
         [HttpGet("by-teacher/{teacherId}")]
+        [Authorize(Policy = "RequireTeacherOrAdminRole")] 
         public async Task<IActionResult> GetSchedulesByTeacher(string teacherId)
         {
             var schedules = await _scheduleService.GetByTeacherIdAsync(teacherId);
