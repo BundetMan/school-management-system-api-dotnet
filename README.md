@@ -78,7 +78,7 @@ Swagger UI at `https://localhost:5001/swagger`
 | Role | Access |
 |---|---|
 | `admin` | Full access |
-| `staff` | Registration, payments, class assignment |
+| `teacher` | Registration, payments, class assignment |
 
 ---
 
