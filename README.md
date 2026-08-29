@@ -27,7 +27,6 @@ ASP.NET Core REST API for managing student registration, class assignment, teach
 
 ```bash
 git clone https://github.com/BundetMan/school-management-system-api-dotnet
-cd school-registration-api-dotnet
 
 cp appsettings.Example.json appsettings.Development.json
 # Edit appsettings.Development.json with your DB connection string
